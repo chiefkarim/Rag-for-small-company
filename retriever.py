@@ -1,8 +1,7 @@
 from llama_index.core import StorageContext, load_index_from_storage, Settings
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from llama_index.core.postprocessor import SentenceTransformerRerank
-from llama_index.llms.ollama import Ollama
-from llama_index.core.base.response.schema import StreamingResponse
+from utils import dump_json
 
 Settings.embed_model = FastEmbedEmbedding(
     model_name="BAAI/bge-small-en-v1.5",
@@ -12,23 +11,13 @@ Settings.embed_model = FastEmbedEmbedding(
 storage_context = StorageContext.from_defaults(persist_dir="./indexed-data/")
 index = load_index_from_storage(storage_context=storage_context)
 
+retriever = index.as_retriever(similarity_top_k=10)
+query = "what is the link to the specs for the http protocol?"
+nodes = retriever.retrieve(query)
+
 reranking_post_processor = SentenceTransformerRerank(
     model="ibm-granite/granite-embedding-reranker-english-r2",
     top_n=3,
 )
-
-Settings.llm = Ollama(
-    model="qwen3:0.6b", request_timeout=3000, base_url="127.0.0.1:11434", thinking=False
-)
-query_engine = index.as_query_engine(
-    similarity_top_k=3,
-    node_postprocessors=[reranking_post_processor],
-    streaming=True,
-)
-
-query = "what is the link to the specs for the http protocol?"
-llm_response = query_engine.query(query)
-
-if type(llm_response) == StreamingResponse:
-    for token in llm_response.response_gen:
-        print(token, end="")
+reranked_nodes = reranking_post_processor.postprocess_nodes(nodes, query_str=query)
+dump_json("reranked.json", reranked_nodes)
