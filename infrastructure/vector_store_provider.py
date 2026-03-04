@@ -25,4 +25,4 @@ class VectorStoreProvider:
         return self._vector_store
 
     def get_storage_context(self):
-        return StorageContext.from_defaults(vector_store=self.vector_store)
+        return StorageContext.from_defaults(vector_store=self._vector_store)
