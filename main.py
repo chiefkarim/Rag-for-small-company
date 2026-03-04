@@ -1,11 +1,23 @@
-from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Request
+from starlette.responses import HTMLResponse
+from models.department import Department
 from models.query_request import QueryRequest
 from services import query as queryService
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
+
 templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    departments = [d.value for d in Department]
+    return templates.TemplateResponse(
+        "query.html",
+        {"request": request, "departments": departments},
+    )
 
 
 @app.post("/query")

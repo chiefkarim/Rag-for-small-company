@@ -6,19 +6,70 @@
   <body>
     <h2>Ask a question</h2>
 
-    <form action="/query" method="post">
+    <form id="queryForm">
       <div>
-        <input type="text" name="query" style="width: 400px" required />
+        <input
+          type="text"
+          id="queryInput"
+          name="query"
+          style="width: 400px"
+          required
+        />
       </div>
 
       <div style="margin-top: 10px">
-        <label>department:</label>
-        <input type="text" name="department" placeholder="e.g. networking" />
+        <label for="departmentSelect">department:</label>
+        <select id="departmentSelect" name="department">
+          <option value="">(no filter)</option>
+          {% for dep in departments %}
+          <option value="{{ dep }}">{{ dep }}</option>
+          {% endfor %}
+        </select>
       </div>
 
       <div style="margin-top: 10px">
         <button type="submit">Search</button>
       </div>
     </form>
+
+    <pre id="result" style="margin-top: 16px; white-space: pre-wrap"></pre>
+
+    <script>
+      const form = document.getElementById("queryForm");
+      const resultEl = document.getElementById("result");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const query = document.getElementById("queryInput").value.trim();
+        const department = document.getElementById("departmentSelect").value;
+
+        // Build JSON payload matching your Pydantic model:
+        // QueryRequest: { query: str, filters?: { department?: Department } }
+        const payload = {
+          query,
+          filters: department ? { department } : null,
+        };
+
+        try {
+          const res = await fetch("/query", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const text = await res.text();
+          // Try to pretty print JSON if possible
+          try {
+            const json = JSON.parse(text);
+            resultEl.textContent = JSON.stringify(json, null, 2);
+          } catch {
+            resultEl.textContent = text;
+          }
+        } catch (err) {
+          resultEl.textContent = "Request failed: " + err;
+        }
+      });
+    </script>
   </body>
 </html>
