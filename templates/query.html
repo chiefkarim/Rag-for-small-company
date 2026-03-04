@@ -1,12 +1,24 @@
+<!doctype html>
 <html>
   <head>
     <title>Vector Search</title>
   </head>
   <body>
     <h2>Ask a question</h2>
+
     <form action="/query" method="post">
-      <input type="text" name="query" style="width: 400px" />
-      <button type="submit">Search</button>
+      <div>
+        <input type="text" name="query" style="width: 400px" required />
+      </div>
+
+      <div style="margin-top: 10px">
+        <label>department:</label>
+        <input type="text" name="department" placeholder="e.g. networking" />
+      </div>
+
+      <div style="margin-top: 10px">
+        <button type="submit">Search</button>
+      </div>
     </form>
   </body>
 </html>

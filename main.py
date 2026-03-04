@@ -14,5 +14,5 @@ async def QueryForm(request: Request):
 
 
 @app.post("/query")
-async def Query(query: str = Form(...)):
-    return queryService.query(query)
+async def Query(query: str = Form(...), department: str = Form(...)):
+    return queryService.query(query, user_filters={"department": department})
