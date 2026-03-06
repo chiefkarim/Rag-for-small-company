@@ -11,6 +11,7 @@ class VectorStoreProvider:
     def __init__(self, collection_name="company-docs") -> None:
         self.qdrant = QdrantConfig()
         self.client = self.qdrant.client
+        self.aclient = self.qdrant.aclient
 
         Settings.embed_model = FastEmbedEmbedding(
             model_name="BAAI/bge-small-en-v1.5",
@@ -18,7 +19,7 @@ class VectorStoreProvider:
         )
 
         self._vector_store = QdrantVectorStore(
-            client=self.client, collection_name=collection_name
+            client=self.client, aclient=self.aclient, collection_name=collection_name
         )
 
     def get_vector_store(self):

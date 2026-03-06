@@ -1,11 +1,9 @@
 from os import getenv
-from dotenv import load_dotenv
-from qdrant_client import QdrantClient
+from qdrant_client import AsyncQdrantClient, QdrantClient
 
 
 class QdrantConfig:
     def __init__(self):
-        load_dotenv()
 
         self.qdrant_api_key = getenv("QDRANT_API_KEY")
         self.qdrant_endpoint = getenv("QDRANT_URL")
@@ -16,6 +14,9 @@ class QdrantConfig:
         if self.qdrant_endpoint is None:
             raise ValueError("QDRANT_ENDPOINT is None")
 
+        self.aclient = AsyncQdrantClient(
+            url=self.qdrant_endpoint, api_key=self.qdrant_api_key
+        )
         self.client = QdrantClient(
             url=self.qdrant_endpoint, api_key=self.qdrant_api_key
         )

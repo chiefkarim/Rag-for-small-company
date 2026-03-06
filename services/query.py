@@ -9,8 +9,11 @@ from models.query_request import QueryFilters
 from services.filter_handler import FilterHandlerFactory
 
 
-def query(query: str, user_filters: Optional[QueryFilters] = None):
-    provider = VectorStoreProvider()
+def query(
+    vectore_store: VectorStoreProvider,
+    query: str,
+    user_filters: Optional[QueryFilters] = None,
+):
     must = []
 
     if user_filters:
@@ -19,11 +22,9 @@ def query(query: str, user_filters: Optional[QueryFilters] = None):
 
     qdrant_filters = Filter(must=must) if len(must) != 0 else None
 
-    index = VectorStoreIndex.from_vector_store(vector_store=provider.get_vector_store())
-
-    retriever = index.as_retriever(
-        vector_store_kwargs=(
-            {"qdrant_filters": qdrant_filters} if qdrant_filters else None
-        )
+    index = VectorStoreIndex.from_vector_store(
+        vector_store=vectore_store.get_vector_store()
     )
+    filters = {"qdrant_filters": qdrant_filters} if qdrant_filters else {}
+    retriever = index.as_retriever(vector_store_kwargs=(filters))
     return retriever.retrieve(query)

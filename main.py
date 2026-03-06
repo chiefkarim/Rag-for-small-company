@@ -1,12 +1,34 @@
-from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
+from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
+from databases.db import DatabaseConfig
+from infrastructure.vector_store_provider import VectorStoreProvider
 from models.department import Department
 from models.query_request import QueryRequest
 from services import query as queryService
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
 
-app = FastAPI()
+load_dotenv()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.db = DatabaseConfig()
+    app.state.vector_store = VectorStoreProvider()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+def get_db(request: Request):
+    return request.app.state.db.client
+
+
+def get_vectore_store(request: Request):
+    return request.app.state.vector_store
 
 
 templates = Jinja2Templates(directory="templates")
@@ -24,5 +46,7 @@ async def home(request: Request):
 
 
 @app.post("/query")
-async def Query(payload: QueryRequest):
-    return queryService.query(payload.query, user_filters=payload.filters)
+async def Query(payload: QueryRequest, vectore_store=Depends(get_vectore_store)):
+    return queryService.query(
+        vectore_store=vectore_store, query=payload.query, user_filters=payload.filters
+    )
