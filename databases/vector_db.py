@@ -8,7 +8,7 @@ class QdrantConfig:
         load_dotenv()
 
         self.qdrant_api_key = getenv("QDRANT_API_KEY")
-        self.qdrant_endpoint = getenv("QDRANT_ENDPOINT")
+        self.qdrant_endpoint = getenv("QDRANT_URL")
 
         if self.qdrant_api_key is None:
             raise ValueError("QDRANT_API_KEY is None")
