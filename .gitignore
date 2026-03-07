@@ -2,6 +2,9 @@ test_data/
 indexed-data/**
 tmp_*
 ./databases/sqlite/**
+databases/sqlite/*.db
+databases/sqlite/*.db-*
+databases/sqlite/
 .env*
 # Byte-compiled / optimized / DLL files
 __pycache__/

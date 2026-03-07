@@ -3,6 +3,7 @@ import libsql
 
 
 class DatabaseConfig:
+
     def __init__(self, read_only: bool = False) -> None:
 
         self._db_auth_token = getenv(
@@ -23,3 +24,4 @@ class DatabaseConfig:
             sync_url=self._db_url,
             auth_token=self._db_auth_token,
         )
+        self.client.sync()

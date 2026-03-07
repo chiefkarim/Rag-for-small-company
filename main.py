@@ -3,12 +3,16 @@ from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
 from databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
+from deps import get_vectore_store
 from models.department import Department
 from models.query_request import QueryRequest
 from services import query as queryService
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
+from routes.projects import router as projects_router
+from routes.users import router as users_router
+from routes.users_projects import router as users_projects_router
 
 load_dotenv()
 
@@ -23,17 +27,12 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-def get_db(request: Request):
-    return request.app.state.db.client
-
-
-def get_vectore_store(request: Request):
-    return request.app.state.vector_store
-
-
 templates = Jinja2Templates(directory="templates")
 
 app.mount("/static", StaticFiles(directory="./static/"), name="static")
+app.include_router(projects_router)
+app.include_router(users_router)
+app.include_router(users_projects_router)
 
 
 @app.get("/", response_class=HTMLResponse)
