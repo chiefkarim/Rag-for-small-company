@@ -20,7 +20,7 @@ class DatabaseConfig:
             raise ValueError("DATABASE_URL is None")
 
         self.client = libsql.connect(
-            database="./databases/sqlite/local.db",
+            database="./infrastructure/databases/sqlite/local.db",
             sync_url=self._db_url,
             auth_token=self._db_auth_token,
         )

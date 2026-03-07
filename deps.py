@@ -1,6 +1,6 @@
 from fastapi import Request
 from typing import cast
-from databases.db import DatabaseConfig
+from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
 import sqlite3
 

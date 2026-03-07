@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
-from databases.db import DatabaseConfig
+from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
 from deps import get_vectore_store
 from models.department import Department

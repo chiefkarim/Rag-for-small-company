@@ -1,6 +1,6 @@
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from databases.vector_db import QdrantConfig
+from .databases.vector_db import QdrantConfig
 from llama_index.core import (
     Settings,
     StorageContext,

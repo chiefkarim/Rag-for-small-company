@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from fastapi import Depends
 import sqlite3
-from main_dependencies import get_db
-from users.write import CreateUser
-from users.read import User
+from deps import get_db
+from .users_dto import CreateUser
+from models.user import User
 
 router = APIRouter(prefix="/users")
 
