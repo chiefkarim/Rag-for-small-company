@@ -1,5 +1,6 @@
 import json
 from os import remove, path
+import os
 import numpy as np
 from enum import Enum
 
@@ -24,6 +25,11 @@ def to_jsonable(obj):
         return {k: to_jsonable(v) for k, v in obj.__dict__.items() if not callable(v)}
     # fallback: convert to string
     return str(obj)
+
+
+def abs_path(parent_file_path, target_file_path):
+    BASE_PATH = os.path.dirname(os.path.abspath(parent_file_path))
+    return os.path.join(BASE_PATH, target_file_path)
 
 
 def dump_json(filename, data):
