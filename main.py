@@ -3,16 +3,19 @@ from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
 from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
-from deps import get_vectore_store
+from deps import get_google_drive, get_vectore_store
 from models.department import Department
 from models.query_request import QueryRequest
-from services import query as queryService
+from routes.embed_dto import EmbedRequest
+from services import query as query_service
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from routes.projects import router as projects_router
 from routes.users import router as users_router
 from routes.users_projects import router as users_projects_router
+from services.google_drive.google_drive_service import GoogleDriveService
+from services.ingestion.embed import embed as embed_service
 
 load_dotenv()
 
@@ -21,6 +24,7 @@ load_dotenv()
 async def lifespan(app: FastAPI):
     app.state.db = DatabaseConfig()
     app.state.vector_store = VectorStoreProvider()
+    app.state.google_drive = GoogleDriveService()
     yield
 
 
@@ -45,7 +49,25 @@ async def home(request: Request):
 
 
 @app.post("/query")
-async def Query(payload: QueryRequest, vectore_store=Depends(get_vectore_store)):
-    return queryService.query(
-        vectore_store=vectore_store, query=payload.query, user_filters=payload.filters
+async def query(
+    payload: QueryRequest,
+    vector_store: VectorStoreProvider = Depends(get_vectore_store),
+):
+    return query_service.query(
+        vector_store=vector_store, query=payload.query, user_filters=payload.filters
+    )
+
+
+@app.post("/embed")
+async def embed(
+    payload: EmbedRequest,
+    vector_store: VectorStoreProvider = Depends(get_vectore_store),
+    google_drive: GoogleDriveService = Depends(get_google_drive),
+):
+    return embed_service(
+        file_id=payload.file_id,
+        project_id=payload.project_id,
+        Department=payload.department,
+        google_drive_service=google_drive,
+        vector_store=vector_store,
     )

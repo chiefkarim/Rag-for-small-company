@@ -9,7 +9,7 @@ from services.filter_handler import FilterHandlerFactory
 
 
 def query(
-    vectore_store: VectorStoreProvider,
+    vector_store: VectorStoreProvider,
     query: str,
     user_filters: Optional[QueryFilters] = None,
 ):
@@ -20,7 +20,7 @@ def query(
         filters = filter_handler.apply_filters(user_filters)
 
     index = VectorStoreIndex.from_vector_store(
-        vector_store=vectore_store.get_vector_store()
+        vector_store=vector_store.get_vector_store()
     )
     retriever = index.as_retriever(
         vector_store_kwargs={"qdrant_filters": filters}, similarity_top_k=10

@@ -18,7 +18,7 @@ class VectorStoreProvider:
 
         Settings.embed_model = FastEmbedEmbedding(
             model_name="BAAI/bge-small-en-v1.5",
-            local_files_only=True,
+            local_files_only=False,
         )
 
         self._vector_store = QdrantVectorStore(

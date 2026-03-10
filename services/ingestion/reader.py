@@ -18,8 +18,8 @@ def serialize_metadata(md: FileMetadata) -> dict[str, Any]:
     }
 
 
-def file_metadata(file_path: str) -> dict[str, Any]:
-    result = department_extractor(file_path)
+def file_metadata(file_path: str, department) -> dict[str, Any]:
+    result = department_extractor(department)
     result = fille_metadata_extractor(file_path, result)
     result = serialize_metadata(result)
 
@@ -33,11 +33,9 @@ def fille_metadata_extractor(file_path: str, metadata: FileMetadata) -> FileMeta
     return result
 
 
-def department_extractor(file_path: str) -> FileMetadata:
-    parent_dir = file_path.split(os.sep)[-2]
-
+def department_extractor(department: Department) -> FileMetadata:
     result: FileMetadata = {
-        "department": Department(parent_dir),
+        "department": department,
         "created_at": None,
     }
 

@@ -1,9 +1,20 @@
+import os
+import tempfile
 import time
 
-from llama_index.core import SimpleDirectoryReader, Settings
+from llama_index.core import SimpleDirectoryReader, Settings, readers
 from llama_index.core.node_parser import SentenceSplitter
+from qdrant_client.grpc import Vector
 from infrastructure.vector_store_provider import VectorStoreProvider
+from models.department import Department
 from .reader import file_metadata
+from llama_index.readers.docling import DoclingReader
+from llama_index.node_parser.docling import DoclingNodeParser
+
+from services.google_drive.google_drive_service import GoogleDriveService
+
+TEMP_PATH = os.path.join(tempfile.gettempdir(), "/tmp")
+OUTPUT_PATH = os.path.join(TEMP_PATH, "tmp_file.pdf")
 
 
 def stage_timer(stage_name, start):
@@ -11,48 +22,48 @@ def stage_timer(stage_name, start):
     print(f"[TIMER] {stage_name}: {elapsed:.2f}s")
 
 
-pipeline_start = time.perf_counter()
+def embed(
+    file_id: str,
+    project_id: str | None,
+    google_drive_service: GoogleDriveService,
+    vector_store: VectorStoreProvider,
+    department: Department = Department.GENERAL,
+):
+    pipeline_start = time.perf_counter()
+    google_drive_service.download_file(OUTPUT_PATH, file_id)
 
-# --- Read documents ---
-start = time.perf_counter()
-reader = SimpleDirectoryReader(
-    input_dir="./test_data/departments/hr",
-    file_metadata=file_metadata,
-    recursive=True,
-)
-documents = reader.load_data()
-stage_timer("Document loading", start)
+    # --- Read documents ---
+    reader = DoclingReader(export_type=DoclingReader.ExportType.JSON)
+    node_parser = DoclingNodeParser()
 
-# --- Parse to nodes ---
-start = time.perf_counter()
-sentence_parser = SentenceSplitter(
-    chunk_size=3072,
-    chunk_overlap=300,
-)
-nodes = sentence_parser.get_nodes_from_documents(documents)
-stage_timer("Sentence splitting / node creation", start)
+    documents = reader.load_data(OUTPUT_PATH)
+    for doc in documents:
+        doc.metadata.update(file_metadata(OUTPUT_PATH, department))
 
-# --- Initialize vector store ---
-start = time.perf_counter()
-provider = VectorStoreProvider()
-vector_store = provider.get_vector_store()
-stage_timer("Vector store initialization", start)
+    nodes = node_parser.get_nodes_from_documents(documents, True)
 
-# --- Generate embeddings only ---
-start = time.perf_counter()
-embed_model = Settings.embed_model
+    # --- Initialize vector store ---
+    start = time.perf_counter()
 
-texts = [node.get_content(metadata_mode="all") for node in nodes]
-embeddings = embed_model.get_text_embedding_batch(texts, show_progress=True)
+    store = vector_store.get_vector_store()
+    stage_timer("Vector store initialization", start)
 
-for node, embedding in zip(nodes, embeddings):
-    node.embedding = embedding
+    # --- Generate embeddings only ---
+    start = time.perf_counter()
+    embed_model = Settings.embed_model
 
-stage_timer("Embedding generation only", start)
+    texts = [node.get_content() for node in nodes]
+    embeddings = embed_model.get_text_embedding_batch(texts, show_progress=True)
 
-# --- Upload to Qdrant only ---
-start = time.perf_counter()
-vector_store.add(nodes)
-stage_timer("Qdrant upload only", start)
+    for node, embedding in zip(nodes, embeddings):
+        node.embedding = embedding
 
-stage_timer("Total pipeline", pipeline_start)
+    stage_timer("Embedding generation only", start)
+
+    # --- Upload to Qdrant only ---
+    start = time.perf_counter()
+    store.add(nodes)
+    stage_timer("Qdrant upload only", start)
+
+    stage_timer("Total pipeline", pipeline_start)
+    return {"success"}

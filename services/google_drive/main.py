@@ -9,18 +9,18 @@ service = GoogleDriveService()
 request = service.service.files().get_media(fileId=FILE_ID)
 
 
-service.download_file(OUTPUT_PATH, FILE_ID)
+# service.download_file(OUTPUT_PATH, FILE_ID)
 
 
 ## open file for reading with OUTPUT_PATH
 
 ## do something withj docling to extract metadata
 
-# results = service.files().list(pageSize=10, fields="files(id,name)").execute()
-#
-#
-# for file in results.get("files", []):
-#     print(
-#         "file:",
-#     )
-#     print(file["name"], file["id"])
+results = service.service.files().list(pageSize=10, fields="files(id,name)").execute()
+
+
+for file in results.get("files", []):
+    print(
+        "file:",
+    )
+    print(file["name"], file["id"])
