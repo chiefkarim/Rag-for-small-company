@@ -59,15 +59,15 @@ async def query(
 
 
 @app.post("/embed")
-async def embed(
+def embed(
     payload: EmbedRequest,
     vector_store: VectorStoreProvider = Depends(get_vectore_store),
     google_drive: GoogleDriveService = Depends(get_google_drive),
 ):
     return embed_service(
-        file_id=payload.file_id,
+        file_ids=payload.file_ids,
         project_id=payload.project_id,
-        Department=payload.department,
+        department=payload.department,
         google_drive_service=google_drive,
         vector_store=vector_store,
     )

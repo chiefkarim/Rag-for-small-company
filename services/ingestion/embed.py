@@ -1,46 +1,47 @@
 import os
 import tempfile
 
-from llama_index.core import Settings
 from infrastructure.vector_store_provider import VectorStoreProvider
 from models.department import Department
 from .reader import file_metadata
 from llama_index.readers.docling import DoclingReader
 from llama_index.node_parser.docling import DoclingNodeParser
+from llama_index.core import VectorStoreIndex
 
 from services.google_drive.google_drive_service import GoogleDriveService
 
-TEMP_PATH = os.path.join(tempfile.gettempdir(), "/tmp")
-
 
 def embed(
-    file_id: str,
+    file_ids: list[str],
     project_id: str | None,
     google_drive_service: GoogleDriveService,
     vector_store: VectorStoreProvider,
     department: Department = Department.GENERAL,
 ):
-    FILE_PATH = google_drive_service.download_file(TEMP_PATH, file_id)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        reader = DoclingReader(export_type=DoclingReader.ExportType.JSON)
+        node_parser = DoclingNodeParser()
+        
+        all_nodes = []
 
-    reader = DoclingReader(export_type=DoclingReader.ExportType.JSON)
-    node_parser = DoclingNodeParser()
+        for file_id in file_ids:
+            try:
+                FILE_PATH = google_drive_service.download_file(temp_dir, file_id)
+                documents = reader.load_data(FILE_PATH)
+                file_name = os.path.basename(FILE_PATH)
+                for doc in documents:
+                    doc.metadata.update(file_metadata(FILE_PATH, department, project_id, file_name))
 
-    documents = reader.load_data(FILE_PATH)
-    for doc in documents:
-        doc.metadata.update(file_metadata(FILE_PATH, department, project_id))
+                nodes = node_parser.get_nodes_from_documents(documents, True)
+                all_nodes.extend(nodes)
+            except Exception as e:
+                print(f"Failed to process file_id {file_id}: {e}")
 
-    nodes = node_parser.get_nodes_from_documents(documents, True)
+        if not all_nodes:
+            return {"status": "error", "message": "No files were successfully processed"}
 
-    store = vector_store.get_vector_store()
+        store = vector_store.get_vector_store()
+        index = VectorStoreIndex.from_vector_store(vector_store=store)
+        index.insert_nodes(all_nodes)
 
-    embed_model = Settings.embed_model
-
-    texts = [node.get_content() for node in nodes]
-    embeddings = embed_model.get_text_embedding_batch(texts, show_progress=True)
-
-    for node, embedding in zip(nodes, embeddings):
-        node.embedding = embedding
-
-    store.add(nodes)
-
-    return {"success"}
+        return {"status": "success", "nodes_inserted": len(all_nodes)}

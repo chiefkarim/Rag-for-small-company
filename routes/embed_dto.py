@@ -5,6 +5,6 @@ from models.department import Department
 
 
 class EmbedRequest(BaseModel):
-    file_id: str
+    file_ids: list[str]
     department: Department = Department.GENERAL
-    project_id: Optional[str]
+    project_id: Optional[str] = None
