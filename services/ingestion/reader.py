@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 import os
-from sys import meta_path
 from typing import Any, TypedDict
 
 from models.department import Department

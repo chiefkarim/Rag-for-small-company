@@ -4,6 +4,7 @@ import sqlite3
 from .projects_dto import CreateProject
 from deps import get_db
 from models.project import Project
+from repositories import projects as projects_repo
 
 router = APIRouter(prefix="/projects")
 
@@ -14,24 +15,9 @@ router = APIRouter(prefix="/projects")
 async def create_project(
     payload: CreateProject, db: sqlite3.Connection = Depends(get_db)
 ):
-    cursor = db.execute("INSERT INTO projects (name) VALUES (?)", (payload.name,))
-    db.commit()
-
-    user_id = cursor.lastrowid
-
-    cursor = db.execute(
-        "SELECT id, name, created_at FROM projects WHERE id = ?", (user_id,)
-    )
-    columns = [col[0] for col in cursor.description]
-    row = cursor.fetchone()
-
-    return Project.model_validate(dict(zip(columns, row)))
+    return projects_repo.create_project(db, payload.name)
 
 
 @router.get("/", response_model=list[Project])
 async def projects(db: sqlite3.Connection = Depends(get_db)):
-    cursor = db.execute("SELECT * FROM projects;")
-    columns = [col[0] for col in cursor.description]
-    rows = cursor.fetchall()
-
-    return [Project.model_validate(dict(zip(columns, row))) for row in rows]
+    return projects_repo.get_projects(db)
