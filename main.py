@@ -16,6 +16,7 @@ from routes.users import router as users_router
 from routes.users_projects import router as users_projects_router
 from routes.auth import router as auth_router
 from routes.departments import router as departments_router
+from routes.documents import router as documents_router
 from services.google_drive.google_drive_service import GoogleDriveService
 from services.ingestion.embed import embed as embed_service
 
@@ -41,6 +42,7 @@ app.include_router(projects_router)
 app.include_router(users_router)
 app.include_router(users_projects_router)
 app.include_router(departments_router)
+app.include_router(documents_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
