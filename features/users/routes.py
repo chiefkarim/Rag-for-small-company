@@ -1,12 +1,12 @@
-from services.auth import require_admin
+from features.auth.service import require_admin
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 import sqlite3
 from deps import get_db
-from .users_dto import CreateUser
-from models.user import User
-from repositories import users as users_repo
-from services.auth import get_current_user, get_password_hash
+from features.users.dto import CreateUser
+from features.users.models import User
+from features.users import repository as users_repo
+from features.auth.service import get_current_user, get_password_hash
 
 router = APIRouter(prefix="/users",
 dependencies=[Depends(require_admin)]

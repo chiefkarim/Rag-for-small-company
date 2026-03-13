@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from fastapi import Depends
 import sqlite3
-from .projects_dto import CreateProject
+from features.projects.dto import CreateProject
 from deps import get_db
-from models.project import Project
-from repositories import projects as projects_repo
+from features.projects.models import Project
+from features.projects import repository as projects_repo
 
 router = APIRouter(prefix="/projects")
 

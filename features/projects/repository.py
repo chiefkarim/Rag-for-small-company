@@ -1,5 +1,5 @@
 import sqlite3
-from models.project import Project
+from features.projects.models import Project
 
 
 def create_project(db: sqlite3.Connection, name: str) -> Project:

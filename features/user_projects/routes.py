@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 import sqlite3
 from deps import get_db
-from .users_dto import CreateUserProject
-from models.user import UserProject
-from repositories import users_projects as users_projects_repo
+from features.users.dto import CreateUserProject
+from features.users.models import UserProject
+from features.user_projects import repository as users_projects_repo
 
 router = APIRouter(prefix="/users-projects")
 

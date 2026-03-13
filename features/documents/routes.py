@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import sqlite3
 from deps import get_db
-from models.document import DocumentModel
-from routes.documents_dto import CreateDocument, UpdateDocument
-from repositories import documents as documents_repo
-from services.auth import require_admin
+from features.documents.models import DocumentModel
+from features.documents.dto import CreateDocument, UpdateDocument
+from features.documents import repository as documents_repo
+from features.auth.service import require_admin
 
 router = APIRouter(prefix="/documents", dependencies=[Depends(require_admin)])
 

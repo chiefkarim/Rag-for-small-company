@@ -2,7 +2,7 @@ from fastapi import Request
 from infrastructure.vector_store_provider import VectorStoreProvider
 import sqlite3
 
-from services.google_drive.google_drive_service import GoogleDriveService
+from features.google_drive.google_drive_service import GoogleDriveService
 
 
 def get_db(request: Request) -> sqlite3.Connection:

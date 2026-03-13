@@ -11,7 +11,7 @@ from qdrant_client.http.models import (
     PayloadField,
 )
 
-from models.query_request import QueryFields, QueryFilters
+from features.query.models import QueryFields, QueryFilters
 
 
 class FilterHandler:

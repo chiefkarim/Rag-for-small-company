@@ -1,4 +1,4 @@
-from .google_drive_service import GoogleDriveService
+from features.google_drive.google_drive_service import GoogleDriveService
 from utils import abs_path
 
 OUTPUT_PATH = abs_path(__file__, "tmp/tmp_file.pdf")

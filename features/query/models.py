@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 from qdrant_client.http.models import DatetimeRange
-from models.department import Department
+from features.departments.models import Department
 
 
 class QueryFields(BaseModel):

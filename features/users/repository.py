@@ -1,5 +1,5 @@
 import sqlite3
-from models.user import User, UserInDB
+from features.users.models import User, UserInDB
 
 
 def get_user_by_email(db: sqlite3.Connection, email: str) -> UserInDB | None:

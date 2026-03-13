@@ -1,5 +1,5 @@
 import sqlite3
-from models.user import UserProject
+from features.users.models import UserProject
 
 
 def create_user_project(db: sqlite3.Connection, user_id: int, project_id: int) -> UserProject:

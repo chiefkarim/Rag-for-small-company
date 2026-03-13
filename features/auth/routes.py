@@ -4,8 +4,8 @@ from typing import Annotated
 from datetime import timedelta
 from deps import get_db
 import sqlite3
-from services.auth import authenticate_user, register_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
-from models.user import User
+from features.auth.service import authenticate_user, register_user, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
+from features.users.models import User
 
 router = APIRouter(tags=["Authentication"])
 

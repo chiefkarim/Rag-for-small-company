@@ -1,5 +1,5 @@
 import sqlite3
-from models.department import DepartmentModel
+from features.departments.models import DepartmentModel
 
 def get_departments(db: sqlite3.Connection) -> list[DepartmentModel]:
     cursor = db.cursor()

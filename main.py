@@ -4,21 +4,21 @@ from starlette.responses import HTMLResponse
 from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
 from deps import get_google_drive, get_vectore_store
-from models.department import Department
-from models.query_request import QueryRequest
-from routes.embed_dto import EmbedRequest
-from services import query as query_service
+from features.departments.models import Department
+from features.query.models import QueryRequest
+from features.ingestion.dto import EmbedRequest
+from features.query import service as query_service
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
-from routes.projects import router as projects_router
-from routes.users import router as users_router
-from routes.users_projects import router as users_projects_router
-from routes.auth import router as auth_router
-from routes.departments import router as departments_router
-from routes.documents import router as documents_router
-from services.google_drive.google_drive_service import GoogleDriveService
-from services.ingestion.embed import embed as embed_service
+from features.projects.routes import router as projects_router
+from features.users.routes import router as users_router
+from features.user_projects.routes import router as users_projects_router
+from features.auth.routes import router as auth_router
+from features.departments.routes import router as departments_router
+from features.documents.routes import router as documents_router
+from features.google_drive.google_drive_service import GoogleDriveService
+from features.ingestion.embed import embed as embed_service
 
 load_dotenv()
 

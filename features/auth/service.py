@@ -8,8 +8,8 @@ from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
 import sqlite3
 from deps import get_db
-from models.user import UserInDB, User
-from repositories import users as users_repo
+from features.users.models import UserInDB, User
+from features.users import repository as users_repo
 import os
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")

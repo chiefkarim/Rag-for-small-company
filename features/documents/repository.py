@@ -1,7 +1,7 @@
 import sqlite3
 from typing import Optional
 from datetime import datetime
-from models.document import DocumentModel
+from features.documents.models import DocumentModel
 
 def get_documents(db: sqlite3.Connection) -> list[DocumentModel]:
     cursor = db.cursor()

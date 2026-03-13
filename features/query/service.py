@@ -4,8 +4,8 @@ from llama_index.core import (
 )
 
 from infrastructure.vector_store_provider import VectorStoreProvider
-from models.query_request import QueryFilters
-from services.filter_handler import FilterHandlerFactory
+from features.query.models import QueryFilters
+from features.query.filter_handler import FilterHandlerFactory
 
 
 def query(

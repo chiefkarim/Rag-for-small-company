@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 import sqlite3
 from deps import get_db
-from models.department import DepartmentModel
-from routes.departments_dto import CreateDepartment, UpdateDepartment
-from repositories import departments as departments_repo
-from services.auth import require_admin
+from features.departments.models import DepartmentModel
+from features.departments.dto import CreateDepartment, UpdateDepartment
+from features.departments import repository as departments_repo
+from features.auth.service import require_admin
 
 router = APIRouter(prefix="/departments")
 

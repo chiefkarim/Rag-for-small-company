@@ -1,7 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from models.department import Department
+from features.departments.models import Department
 
 
 class EmbedRequest(BaseModel):

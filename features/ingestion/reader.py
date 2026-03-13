@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import os
 from typing import Any, TypedDict
 
-from models.department import Department
+from features.departments.models import Department
 
 
 class FileMetadata(TypedDict):

@@ -2,13 +2,13 @@ import os
 import tempfile
 
 from infrastructure.vector_store_provider import VectorStoreProvider
-from models.department import Department
-from .reader import file_metadata
+from features.departments.models import Department
+from features.ingestion.reader import file_metadata
 from llama_index.readers.docling import DoclingReader
 from llama_index.node_parser.docling import DoclingNodeParser
 from llama_index.core import VectorStoreIndex
 
-from services.google_drive.google_drive_service import GoogleDriveService
+from features.google_drive.google_drive_service import GoogleDriveService
 
 
 def embed(
