@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: playtime
+font link: https://www.fontsquirrel.com/fonts/playtime-with-hot-toddies
+font author: Graham Meade
+font author site: http://www.moorstation.org/typoasis/designers/gemnew/w01.htm
+Slogan Font: Aleo-Light.otf
+
+icon designer: Icons By Alfredo
+icon designer link: /creator/AlfredoCreates/
+        
+{"bg-gradient-0":"#122663","bg-gradient-1":"#5DD7AD","icon":"#ffffff","font":"#ffffff","slogan":"#ffffff"}
+      
