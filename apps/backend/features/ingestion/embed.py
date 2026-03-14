@@ -24,33 +24,65 @@ def embed(
     batch_size: int = 5,
 ):
     """
-    Download, parse, and embed files from Google Drive.
+    Register documents and enqueue the embedding task to Redis.
+    Returns immediately to the user.
+    """
+    # --- Step 1: Fetch names and register documents with correct names ---
+    file_names = []
+    for file_id in file_ids:
+        try:
+            name = google_drive_service.get_file_name(file_id)
+            file_names.append(name)
+        except Exception as e:
+            print(f"Failed to fetch metadata for file_id {file_id}: {e}")
+            file_names.append(f"unknown_{file_id}")
 
-    Files are processed in batches of `batch_size` to reduce DB round-trips.
-    Each file is registered in the documents table as 'pending' upfront.
-    After a batch is successfully embedded its documents are marked 'embedded';
-    individual failures within a batch are marked 'failed'.
+    db_docs = document_service.register_documents(db, file_names)
+
+    # Build a mapping from file_id to DB document id
+    file_id_to_doc_id: dict[str, int] = {
+        file_id: doc.id for file_id, doc in zip(file_ids, db_docs)
+    }
+
+    # Enqueue the task
+    from features.ingestion.tasks import q, process_embed_task
+    
+    # Get department value for serialization
+    dept_val = department.value if hasattr(department, 'value') else str(department)
+
+    q.enqueue(
+        process_embed_task,
+        file_ids=file_ids,
+        file_id_to_doc_id=file_id_to_doc_id,
+        project_id=project_id,
+        department_value=dept_val,
+        batch_size=batch_size
+    )
+
+    return {
+        "status": "queued",
+        "message": f"Embedding process started for {len(file_ids)} files.",
+        "document_ids": [doc.id for doc in db_docs]
+    }
+
+
+def run_embedding(
+    file_ids: list[str],
+    file_id_to_doc_id: dict[str, int],
+    project_id: str | None,
+    google_drive_service: GoogleDriveService,
+    vector_store: VectorStoreProvider,
+    db: sqlite3.Connection,
+    department: Department = Department.GENERAL,
+    batch_size: int = 5,
+):
+    """
+    Actual logic to download, parse, and embed files.
+    This is called by the background worker.
     """
     with tempfile.TemporaryDirectory() as temp_dir:
         reader = DoclingReader(export_type=DoclingReader.ExportType.JSON)
         node_parser = DoclingNodeParser()
-
-        # --- Step 1: Fetch names and register documents with correct names ---
-        file_names = []
-        for file_id in file_ids:
-            try:
-                name = google_drive_service.get_file_name(file_id)
-                file_names.append(name)
-            except Exception as e:
-                print(f"Failed to fetch metadata for file_id {file_id}: {e}")
-                file_names.append(f"unknown_{file_id}")
-
-        db_docs = document_service.register_documents(db, file_names)
-
-        # Build a mapping from file_id to DB document id
-        file_id_to_doc_id: dict[str, int] = {
-            file_id: doc.id for file_id, doc in zip(file_ids, db_docs)
-        }
 
         total_nodes = 0
         store = vector_store.get_vector_store()
@@ -107,3 +139,4 @@ def embed(
                 document_service.mark_documents_failed(db, batch_failed)
 
         return {"status": "success", "nodes_inserted": total_nodes}
+
