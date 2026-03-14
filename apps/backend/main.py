@@ -3,7 +3,8 @@ from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
 from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
-from deps import get_google_drive, get_vectore_store
+import sqlite3
+from deps import get_db, get_google_drive, get_vectore_store
 from features.departments.models import Department
 from features.query.models import QueryRequest
 from features.ingestion.dto import EmbedRequest
@@ -79,6 +80,7 @@ def embed(
     payload: EmbedRequest,
     vector_store: VectorStoreProvider = Depends(get_vectore_store),
     google_drive: GoogleDriveService = Depends(get_google_drive),
+    db: sqlite3.Connection = Depends(get_db),
 ):
     return embed_service(
         file_ids=payload.file_ids,
@@ -86,4 +88,5 @@ def embed(
         department=payload.department,
         google_drive_service=google_drive,
         vector_store=vector_store,
+        db=db,
     )

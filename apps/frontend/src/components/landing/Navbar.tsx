@@ -32,9 +32,9 @@ export default function Navbar() {
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
             <img
-              src="/vector/isolated-monochrome-white.svg"
+              src="/vector/default-monochrome-white.svg"
               alt="latafarraqo logo"
-              className="h-8 w-8 group-hover:scale-110 transition-transform duration-200"
+              className="h-8 group-hover:scale-110 transition-transform duration-200"
             />
             <div className="flex flex-col leading-none">
               <span className="text-white font-bold text-sm tracking-wider uppercase">

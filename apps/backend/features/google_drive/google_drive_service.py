@@ -19,12 +19,15 @@ class GoogleDriveService:
 
         self.service = build("drive", "v3", credentials=creds)
 
-    def download_file(self, output_dir: str, file_id: str) -> str:
+    def get_file_name(self, file_id: str) -> str:
+        """Fetch the file name for a given file_id without downloading the file."""
+        file_metadata = self.service.files().get(fileId=file_id, fields="name").execute()
+        return file_metadata["name"]
+
+    def download_file(self, output_dir: str, file_id: str) -> tuple[str, str]:
         service = self.service
 
-        file_metadata = service.files().get(fileId=file_id, fields="name").execute()
-        file_name = file_metadata["name"]
-
+        file_name = self.get_file_name(file_id)
         output_path = os.path.join(output_dir, file_name)
 
         request = service.files().get_media(fileId=file_id)
@@ -38,4 +41,4 @@ class GoogleDriveService:
             print(f"Download {int(status.progress() * 100)}%.")
 
         print(f"Download complete: {file_name}")
-        return output_path
+        return output_path, file_name

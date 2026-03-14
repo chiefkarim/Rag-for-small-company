@@ -1,7 +1,7 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-  LogOut, User as UserIcon, Shield, Mail, Calendar, Sparkles, LayoutDashboard,
+  LogOut, User as UserIcon, Shield, Mail, Calendar, LayoutDashboard,
   FileText, Settings, ChevronRight,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
@@ -10,7 +10,7 @@ import { getMe } from '@/features/auth/api/userApi';
 function getRoleBadgeStyle(role: string) {
   if (role === 'admin')
     return 'bg-amber-500/15 text-amber-400 border border-amber-500/30';
-  return 'bg-blue-500/15 text-blue-400 border border-blue-500/30';
+  return 'bg-[#5DD7AD]/15 text-[#5DD7AD] border border-[#5DD7AD]/30';
 }
 
 function getInitials(name: string) {
@@ -65,17 +65,23 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-white flex">
+    <div className="min-h-screen bg-[#0a1628] text-white flex relative overflow-hidden">
+      {/* Animated background gradient to match landing page */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#122663] via-[#0a1628] to-[#0d2040] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#5DD7AD]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#122663]/40 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4 pointer-events-none" />
+      
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/5 flex flex-col bg-black/20 backdrop-blur-xl shrink-0">
+      <aside className="w-64 border-r border-white/5 flex flex-col bg-[#080f1e]/95 backdrop-blur-xl shrink-0">
         {/* Logo */}
         <div className="p-6 border-b border-white/5">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-md shadow-blue-500/30">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold text-white/90 text-sm">Enterprise RAG</span>
-          </div>
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src="/vector/default-monochrome-white.svg"
+              alt="latafarraqo logo"
+              className="h-6 group-hover:scale-110 transition-transform duration-200"
+            />
+          </Link>
         </div>
 
         {/* Nav */}
@@ -85,7 +91,7 @@ export default function DashboardPage() {
               key={label}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
                 ${active
-                  ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+                  ? 'bg-[#5DD7AD]/10 text-[#5DD7AD] border border-[#5DD7AD]/20'
                   : 'text-white/50 hover:text-white/90 hover:bg-white/5'
                 }`}
             >
@@ -120,7 +126,7 @@ export default function DashboardPage() {
           </div>
           {user && (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-xs font-bold text-white shadow-md">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5DD7AD] to-[#3ab88e] flex items-center justify-center text-[10px] font-bold text-[#0a1628] shadow-md">
                 {getInitials(user.name)}
               </div>
               <span className="text-sm text-white/70 font-medium">{user.name}</span>
@@ -141,7 +147,7 @@ export default function DashboardPage() {
 
                 <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-6">
                   {/* Avatar */}
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-2xl font-bold text-white shadow-xl shadow-blue-500/30 shrink-0">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#5DD7AD] to-[#3ab88e] flex items-center justify-center text-2xl font-bold text-[#0a1628] shadow-xl shadow-[#5DD7AD]/20 shrink-0">
                     {getInitials(user.name)}
                   </div>
 
@@ -168,9 +174,9 @@ export default function DashboardPage() {
               {/* Stat cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Email card */}
-                <div className="rounded-xl border border-white/10 bg-white/5 p-5 flex items-start gap-4 hover:border-blue-500/30 transition-all duration-200">
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/15 border border-blue-500/20 flex items-center justify-center shrink-0">
-                    <Mail className="w-4 h-4 text-blue-400" />
+                <div className="rounded-xl border border-white/10 bg-white/5 p-5 flex items-start gap-4 hover:border-[#5DD7AD]/30 transition-all duration-200">
+                  <div className="w-9 h-9 rounded-lg bg-[#5DD7AD]/15 border border-[#5DD7AD]/20 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4 text-[#5DD7AD]" />
                   </div>
                   <div>
                     <p className="text-xs text-white/40 font-medium uppercase tracking-wider">Email</p>
