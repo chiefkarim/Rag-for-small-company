@@ -1,6 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { FileText, Clock, CheckCircle2, XCircle } from 'lucide-react';
-import { getDocuments } from '@/features/documents/api/documentsApi';
+import ReactGoogleDrivePicker from 'react-google-drive-picker';
+import { getDocuments, embedDocuments } from '@/features/documents/api/documentsApi';
+import AssignmentModal from '@/features/documents/components/AssignmentModal';
+import type { FileItem, EmbedGroup } from '@/features/documents/components/AssignmentModal';
+
+// Handle CJS/ESM interop for the picker module
+const useDrivePicker = (ReactGoogleDrivePicker as any).useDrivePicker || (ReactGoogleDrivePicker as any).default || ReactGoogleDrivePicker;
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
+const GOOGLE_APP_ID = import.meta.env.VITE_GOOGLE_APP_ID || '';
 
 function getStateIcon(state: string) {
   switch (state) {
@@ -27,10 +38,87 @@ function getStateStyles(state: string) {
 }
 
 export default function DocumentsPage() {
+  const queryClient = useQueryClient();
+  const [openPicker] = useDrivePicker();
+
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [pickedFiles, setPickedFiles] = useState<FileItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { data: documents, isLoading } = useQuery({
     queryKey: ['documents'],
     queryFn: getDocuments,
   });
+
+  const embedMutation = useMutation({
+    mutationFn: embedDocuments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    },
+    onError: (error) => {
+      console.error('Error embedding documents:', error);
+      // Here you could trigger a toast notification (e.g. react-hot-toast)
+    }
+  });
+
+  const handleOpenPicker = () => {
+    openPicker({
+      clientId: GOOGLE_CLIENT_ID,
+      developerKey: GOOGLE_API_KEY,
+      appId: GOOGLE_APP_ID,
+      viewId: 'DOCS',
+      token: '', // Used for initial auth if we already had a token, but the picker will handle OAuth popup
+      showUploadView: true,
+      showUploadFolders: true,
+      supportDrives: true,
+      multiselect: true,
+      customViews: [
+        {
+          viewId: 'DOCS',
+          mimeTypes: 'application/pdf',
+        }
+      ],
+      callbackFunction: (data: any) => {
+        if (data.action === 'picked' && data.docs) {
+          const files = data.docs.map((doc: any) => ({
+            id: doc.id,
+            name: doc.name
+          }));
+          if (files.length > 0) {
+            setPickedFiles(files);
+            setIsAssigning(true);
+          }
+        }
+      },
+    });
+  };
+
+  const handleAssignmentSubmit = async (groups: EmbedGroup[]) => {
+    setIsSubmitting(true);
+    try {
+      await Promise.all(
+        groups.map(group => {
+          const payload: any = {
+            file_ids: group.files.map(f => f.id)
+          };
+          if (group.department) {
+            payload.department = group.department;
+          }
+          if (group.project_id) {
+            payload.project_id = group.project_id;
+          }
+          return embedMutation.mutateAsync(payload);
+        })
+      );
+      setIsAssigning(false);
+      setPickedFiles([]);
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    } catch (error) {
+      console.error('Error in batch embedding:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -40,11 +128,23 @@ export default function DocumentsPage() {
           <p className="text-sm text-white/50 mt-1">
             View and manage documents available for semantic search.
           </p>
+          <p className="text-xs text-amber-400/80 mt-2 flex items-center gap-1.5 bg-amber-400/10 w-fit px-2.5 py-1 rounded-md border border-amber-400/20">
+            Note: Ensure selected files are shared with <span className="font-mono text-amber-400 font-semibold selection:bg-amber-400/30">enterprise-rag@enterprise-rag-489707.iam.gserviceaccount.com</span>
+          </p>
         </div>
         <button
-          className="px-4 py-2 bg-gradient-to-r from-[#5DD7AD] to-[#3ab88e] hover:from-[#4cc69c] hover:to-[#2aa77d] text-[#0a1628] font-medium rounded-lg shadow-lg shadow-[#5DD7AD]/20 transition-all duration-200"
+          onClick={handleOpenPicker}
+          disabled={isSubmitting}
+          className="px-4 py-2 bg-gradient-to-r from-[#5DD7AD] to-[#3ab88e] hover:from-[#4cc69c] hover:to-[#2aa77d] text-[#0a1628] font-medium rounded-lg shadow-lg shadow-[#5DD7AD]/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Add from Google Drive
+          {isSubmitting ? (
+            <>
+              <div className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin" />
+              Processing...
+            </>
+          ) : (
+            'Add from Google Drive'
+          )}
         </button>
       </div>
 
@@ -113,6 +213,17 @@ export default function DocumentsPage() {
           </table>
         </div>
       </div>
+
+      <AssignmentModal
+        isOpen={isAssigning}
+        files={pickedFiles}
+        onClose={() => {
+          setIsAssigning(false);
+          setPickedFiles([]);
+        }}
+        onSubmit={handleAssignmentSubmit}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }

@@ -5,7 +5,6 @@ from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
 import sqlite3
 from deps import get_db, get_google_drive, get_vectore_store
-from features.departments.models import Department
 from features.query.models import QueryRequest
 from features.ingestion.dto import EmbedRequest
 from features.query import service as query_service
@@ -57,8 +56,10 @@ app.include_router(departments_router)
 app.include_router(documents_router)
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    departments = [d.value for d in Department]
+async def home(request: Request, db: sqlite3.Connection = Depends(get_db)):
+    from features.departments import repository as departments_repo
+    deps = departments_repo.get_departments(db)
+    departments = [d.name for d in deps]
     return templates.TemplateResponse(
         "query.html",
         {"request": request, "departments": departments},

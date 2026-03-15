@@ -4,7 +4,7 @@ from rq import Queue
 from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
 from features.google_drive.google_drive_service import GoogleDriveService
-from features.departments.models import Department
+
 from features.ingestion.embed import run_embedding
 
 # Redis connection
@@ -40,12 +40,8 @@ def process_embed_task(
     """
     services = WorkerServices.get_instance()
     
-    # Convert department value back to Enum if possible, or use GENERAL as fallback
-    try:
-        department = Department(department_value)
-    except Exception:
-        print(f"Warning: Could not convert {department_value} to Department enum. Using GENERAL.")
-        department = Department.GENERAL
+    # Use department_value directly
+    department = department_value
 
     run_embedding(
         file_ids=file_ids,

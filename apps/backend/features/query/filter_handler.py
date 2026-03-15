@@ -91,7 +91,7 @@ def department_filter_handler(department_value: Any) -> list[Condition]:
     return [
         FieldCondition(
             key="department",
-            match=MatchValue(value=department_value.value),
+            match=MatchValue(value=str(department_value)),
         )
     ]
 

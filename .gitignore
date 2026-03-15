@@ -1,4 +1,4 @@
-design/
+
 
 test_data/
 indexed-data/**
@@ -224,6 +224,7 @@ dist/
 # Vite
 apps/frontend/dist/
 apps/frontend/.vite/
+apps/frontend/design/
 
 # pnpm
 pnpm-debug.log*

@@ -4,7 +4,7 @@ import sqlite3
 import tempfile
 
 from infrastructure.vector_store_provider import VectorStoreProvider
-from features.departments.models import Department
+
 from features.ingestion.reader import file_metadata
 from features.documents import service as document_service
 from llama_index.readers.docling import DoclingReader
@@ -20,7 +20,7 @@ def embed(
     google_drive_service: GoogleDriveService,
     vector_store: VectorStoreProvider,
     db: sqlite3.Connection,
-    department: Department = Department.GENERAL,
+    department: str = "general",
     batch_size: int = 5,
 ):
     """
@@ -47,15 +47,12 @@ def embed(
     # Enqueue the task
     from features.ingestion.tasks import q, process_embed_task
     
-    # Get department value for serialization
-    dept_val = department.value if hasattr(department, 'value') else str(department)
-
     q.enqueue(
         process_embed_task,
         file_ids=file_ids,
         file_id_to_doc_id=file_id_to_doc_id,
         project_id=project_id,
-        department_value=dept_val,
+        department_value=department,
         batch_size=batch_size
     )
 
@@ -73,7 +70,7 @@ def run_embedding(
     google_drive_service: GoogleDriveService,
     vector_store: VectorStoreProvider,
     db: sqlite3.Connection,
-    department: Department = Department.GENERAL,
+    department: str = "general",
     batch_size: int = 5,
 ):
     """
@@ -106,7 +103,7 @@ def run_embedding(
                     # --- Save metadata file if project_id or department is provided ---
                     if project_id or department:
                         meta_data = {
-                            "department": department.value if hasattr(department, 'value') else str(department),
+                            "department": department,
                             "project_id": project_id
                         }
                         meta_file_path = f"{FILE_PATH}.metadata.json"

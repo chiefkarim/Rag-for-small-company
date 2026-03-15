@@ -2,18 +2,15 @@ from datetime import datetime, timezone
 import os
 from typing import Any, TypedDict
 
-from features.departments.models import Department
-
-
 class FileMetadata(TypedDict):
-    department: Department
+    department: str
     created_at: str | None
     file_name: str
 
 
 def serialize_metadata(md: FileMetadata, project_id: str | None) -> dict[str, Any]:
     metadata = {
-        "department": md["department"].value,
+        "department": md["department"],
         "created_at": md["created_at"],
         "file_name": md["file_name"]
     }
@@ -24,7 +21,7 @@ def serialize_metadata(md: FileMetadata, project_id: str | None) -> dict[str, An
 
 
 def file_metadata(
-    file_path: str, department: Department, project_id: str | None, file_name: str
+    file_path: str, department: str, project_id: str | None, file_name: str
 ) -> dict[str, Any]:
     result = department_extractor(department)
     result = file_metadata_extractor(file_path, file_name, result)
@@ -42,7 +39,7 @@ def file_metadata_extractor(file_path: str, file_name: str, metadata: FileMetada
     }
 
 
-def department_extractor(department: Department) -> FileMetadata:
+def department_extractor(department: str) -> FileMetadata:
     result: FileMetadata = {
         "department": department,
         "created_at": None,

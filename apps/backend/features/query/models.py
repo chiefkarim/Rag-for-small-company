@@ -3,11 +3,10 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 from qdrant_client.http.models import DatetimeRange
-from features.departments.models import Department
 
 
 class QueryFields(BaseModel):
-    department: Optional[Department] = None
+    department: Optional[str] = None
     created_at: Optional[DatetimeRange] = None
     project_id: Optional[int] = None
     is_empty: list[str] = Field(default_factory=list)
