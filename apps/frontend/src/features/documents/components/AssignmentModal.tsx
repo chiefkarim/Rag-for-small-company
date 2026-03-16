@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
 import { X, FileText, GripVertical, Building2, FolderKanban, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getProjects } from '@/features/projects/api/projectsApi';
 import { getDepartments } from '@/features/departments/api/departmentsApi';
+import { useDocumentAssignment } from '../hooks/useDocumentAssignment';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 
 export interface FileItem {
   id: string;
@@ -14,7 +17,6 @@ export interface EmbedGroup {
   project_id?: string;
   files: FileItem[];
 }
-
 
 interface AssignmentModalProps {
   files: FileItem[];
@@ -31,8 +33,16 @@ export default function AssignmentModal({
   onSubmit,
   isSubmitting 
 }: AssignmentModalProps) {
-  const [fileAssignments, setFileAssignments] = useState<Record<string, string>>({});
-  const [draggedFileId, setDraggedFileId] = useState<string | null>(null);
+  const {
+    draggedFileId,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragEnd,
+    getUnassignedFiles,
+    getAssignedFiles,
+    getEmbedGroups
+  } = useDocumentAssignment(files, isOpen);
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
@@ -46,116 +56,42 @@ export default function AssignmentModal({
     enabled: isOpen,
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      // Initialize all files to unassigned
-      const initial: Record<string, string> = {};
-      files.forEach(f => {
-        initial[f.id] = 'unassigned';
-      });
-      setFileAssignments(initial);
-    }
-  }, [isOpen, files]);
-
   if (!isOpen) return null;
 
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    setDraggedFileId(id);
-    e.dataTransfer.setData('text/plain', id);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleDrop = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('text/plain');
-    if (id && files.some(f => f.id === id)) {
-      setFileAssignments(prev => ({ ...prev, [id]: targetId }));
-    }
-    setDraggedFileId(null);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedFileId(null);
-  };
-
-  const unassignedFiles = files.filter(f => fileAssignments[f.id] === 'unassigned' || !fileAssignments[f.id]);
-  
-  const getAssignedFiles = (targetId: string) => files.filter(f => fileAssignments[f.id] === targetId);
-
-  const handleConfirm = () => {
-    const deptGroups: Record<string, FileItem[]> = {};
-    const projGroups: Record<string, FileItem[]> = {};
-    
-    files.forEach(f => {
-      const target = fileAssignments[f.id];
-      if (!target || target === 'unassigned') return;
-      
-      if (target.startsWith('dept-')) {
-        const dept = target.replace('dept-', '');
-        if (!deptGroups[dept]) deptGroups[dept] = [];
-        deptGroups[dept].push(f);
-      } else if (target.startsWith('proj-')) {
-        const projId = target.replace('proj-', '');
-        if (!projGroups[projId]) projGroups[projId] = [];
-        projGroups[projId].push(f);
-      }
-    });
-
-    const result: EmbedGroup[] = [];
-    Object.entries(deptGroups).forEach(([dept, fb]) => {
-      if (fb.length > 0) result.push({ department: dept, files: fb });
-    });
-    Object.entries(projGroups).forEach(([projId, fb]) => {
-      if (fb.length > 0) result.push({ project_id: projId, files: fb });
-    });
-
-    onSubmit(result);
-  };
-
-  const hasUnassigned = unassignedFiles.length > 0;
+  const unassignedFiles = getUnassignedFiles();
   const hasAssigned = files.length > unassignedFiles.length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0a1628] border border-white/10 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <Card className="w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-white/5">
           <div>
             <h2 className="text-xl font-bold text-white">Assign Documents</h2>
             <p className="text-sm text-white/60 mt-1">
               Drag and drop documents to organize them into departments or projects before embedding.
             </p>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} disabled={isSubmitting}>
             <X className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Content layout: 2 columns */}
         <div className="flex-1 overflow-hidden flex flex-col lg:flex-row min-h-[400px]">
           
           {/* Left Column: Unassigned Files */}
-          <div className="w-full lg:w-1/3 flex flex-col border-r border-white/10 bg-white/[0.02]">
-            <div className="p-4 border-b border-white/10 bg-white/5">
+          <div className="w-full lg:w-1/3 flex flex-col border-r border-border bg-white/[0.02]">
+            <div className="p-4 border-b border-border bg-white/5">
               <h3 className="font-semibold text-white flex items-center justify-between">
                 <span>Unassigned Files</span>
-                <span className="bg-white/10 text-white/80 text-xs py-0.5 px-2 rounded-full">
-                  {unassignedFiles.length}
-                </span>
+                <Badge variant="default">{unassignedFiles.length}</Badge>
               </h3>
             </div>
             
             <div 
-              className={`flex-1 overflow-y-auto p-4 space-y-2 transition-colors duration-200 ${draggedFileId ? 'bg-[#5DD7AD]/5' : ''}`}
+              className={`flex-1 overflow-y-auto p-4 space-y-2 transition-colors duration-200 ${draggedFileId ? 'bg-primary/5' : ''}`}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, 'unassigned')}
             >
@@ -173,10 +109,10 @@ export default function AssignmentModal({
                     draggable
                     onDragStart={(e) => handleDragStart(e, file.id)}
                     onDragEnd={handleDragEnd}
-                    className="group bg-white/5 border border-white/10 hover:border-[#5DD7AD]/50 rounded-lg p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing transition-all hover:bg-white/10"
+                    className="group bg-white/5 border border-border hover:border-primary/50 rounded-lg p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing transition-all hover:bg-white/10"
                   >
                     <GripVertical className="w-4 h-4 text-white/30 group-hover:text-white/60" />
-                    <FileText className="w-4 h-4 text-[#5DD7AD]" />
+                    <FileText className="w-4 h-4 text-primary" />
                     <span className="text-sm text-white/90 truncate flex-1" title={file.name}>
                       {file.name}
                     </span>
@@ -187,13 +123,13 @@ export default function AssignmentModal({
           </div>
 
           {/* Right Column: Drop Targets */}
-          <div className="w-full lg:w-2/3 flex flex-col bg-[#0a1628]">
+          <div className="w-full lg:w-2/3 flex flex-col bg-background/50">
             <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               
               {/* Departments */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-white/80 pb-2 border-b border-white/10">
-                  <Building2 className="w-5 h-5 text-[#5DD7AD]" />
+                <div className="flex items-center gap-2 text-white/80 pb-2 border-b border-border">
+                  <Building2 className="w-5 h-5 text-primary" />
                   <h3 className="font-semibold text-white">Departments</h3>
                 </div>
                 <div className="space-y-3">
@@ -207,12 +143,12 @@ export default function AssignmentModal({
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, targetId)}
                         className={`border rounded-xl p-4 transition-all duration-200 
-                          ${draggedFileId ? 'border-[#5DD7AD]/30 bg-[#5DD7AD]/5' : 'border-white/10 bg-white/5'}
+                          ${draggedFileId ? 'border-primary/30 bg-primary/5' : 'border-border bg-white/5'}
                         `}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-white/90 capitalize">{dept.name}</h4>
-                          <span className="text-xs text-white/50 bg-white/10 px-2 py-0.5 rounded-full">{assignedList.length} files</span>
+                          <Badge variant="default">{assignedList.length}</Badge>
                         </div>
                         <div className="space-y-1.5 min-h-[40px] rounded-lg p-1">
                           {assignedList.length === 0 ? (
@@ -226,7 +162,7 @@ export default function AssignmentModal({
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, f.id)}
                                 onDragEnd={handleDragEnd}
-                                className="bg-[#0a1628] border border-white/10 rounded px-2 py-1.5 flex items-center gap-2 cursor-grab active:cursor-grabbing text-xs text-white/80 hover:bg-white/5"
+                                className="bg-background border border-border rounded px-2 py-1.5 flex items-center gap-2 cursor-grab active:cursor-grabbing text-xs text-white/80 hover:bg-white/5"
                               >
                                 <GripVertical className="w-3 h-3 text-white/30" />
                                 <span className="truncate" title={f.name}>{f.name}</span>
@@ -242,7 +178,7 @@ export default function AssignmentModal({
 
               {/* Projects */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-white/80 pb-2 border-b border-white/10">
+                <div className="flex items-center gap-2 text-white/80 pb-2 border-b border-border">
                   <FolderKanban className="w-5 h-5 text-indigo-400" />
                   <h3 className="font-semibold text-white">Projects</h3>
                 </div>
@@ -257,12 +193,12 @@ export default function AssignmentModal({
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, targetId)}
                         className={`border rounded-xl p-4 transition-all duration-200 
-                          ${draggedFileId ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-white/10 bg-white/5'}
+                          ${draggedFileId ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-border bg-white/5'}
                         `}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-white/90 truncate pr-2" title={proj.name}>{proj.name}</h4>
-                          <span className="text-xs text-white/50 bg-white/10 px-2 py-0.5 rounded-full shrink-0">{assignedList.length} files</span>
+                          <Badge variant="default">{assignedList.length}</Badge>
                         </div>
                         <div className="space-y-1.5 min-h-[40px] rounded-lg p-1">
                           {assignedList.length === 0 ? (
@@ -276,7 +212,7 @@ export default function AssignmentModal({
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, f.id)}
                                 onDragEnd={handleDragEnd}
-                                className="bg-[#0a1628] border border-white/10 rounded px-2 py-1.5 flex items-center gap-2 cursor-grab active:cursor-grabbing text-xs text-white/80 hover:bg-white/5"
+                                className="bg-background border border-border rounded px-2 py-1.5 flex items-center gap-2 cursor-grab active:cursor-grabbing text-xs text-white/80 hover:bg-white/5"
                               >
                                 <GripVertical className="w-3 h-3 text-white/30" />
                                 <span className="truncate" title={f.name}>{f.name}</span>
@@ -295,9 +231,9 @@ export default function AssignmentModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/10 bg-white/5 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-border bg-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {hasUnassigned && (
+            {unassignedFiles.length > 0 && (
               <div className="flex items-center gap-1.5 text-amber-400 text-sm">
                 <AlertCircle className="w-4 h-4" />
                 <span>Unassigned files will be ignored</span>
@@ -305,19 +241,17 @@ export default function AssignmentModal({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors disabled:opacity-50"
             >
               Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirm}
+            </Button>
+            <Button
+              onClick={() => onSubmit(getEmbedGroups())}
               disabled={isSubmitting || !hasAssigned}
-              className="px-6 py-2 bg-gradient-to-r from-[#5DD7AD] to-[#3ab88e] hover:from-[#4cc69c] hover:to-[#2aa77d] text-[#0a1628] font-medium rounded-lg shadow-lg shadow-[#5DD7AD]/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6"
             >
               {isSubmitting ? (
                 <>
@@ -327,11 +261,11 @@ export default function AssignmentModal({
               ) : (
                 'Confirm Embed'
               )}
-            </button>
+            </Button>
           </div>
         </div>
 
-      </div>
+      </Card>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export interface EmbedRequest {
 }
 
 export const embedDocuments = async (payload: EmbedRequest): Promise<void> => {
-  const requestData: any = {
+  const requestData: Record<string, any> = {
     file_ids: payload.file_ids,
   };
   

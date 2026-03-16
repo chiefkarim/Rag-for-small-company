@@ -36,14 +36,6 @@ export default function Navbar() {
               alt="latafarraqo logo"
               className="h-8 group-hover:scale-110 transition-transform duration-200"
             />
-            <div className="flex flex-col leading-none">
-              <span className="text-white font-bold text-sm tracking-wider uppercase">
-                latafarraqo
-              </span>
-              <span className="text-[#5DD7AD] text-[8px] tracking-[0.2em] uppercase">
-                la tafarraqo
-              </span>
-            </div>
           </a>
 
           {/* Desktop Nav */}
