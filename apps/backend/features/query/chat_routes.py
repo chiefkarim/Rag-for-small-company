@@ -6,7 +6,10 @@ from infrastructure.vector_store_provider import VectorStoreProvider
 from llama_index.core import VectorStoreIndex, Settings
 from llama_index.core.postprocessor import SentenceTransformerRerank
 from llama_index.llms.ollama import Ollama
-from llama_index.core.base.response.schema import StreamingResponse as LlamaStreamingResponse
+from llama_index.core.base.response.schema import (
+    StreamingResponse as LlamaStreamingResponse,
+    AsyncStreamingResponse as LlamaAsyncStreamingResponse,
+)
 from starlette.concurrency import run_in_threadpool
 import json
 import logging
@@ -62,11 +65,13 @@ async def chat(
 
     async def event_generator():
         try:
-            # query_engine.query is synchronous and blocks. 
-            # We run it in a threadpool to avoid blocking the event loop.
-            llm_response = await run_in_threadpool(query_engine.query, payload.query)
+            # Use the asynchronous aquery to avoid blocking the event loop
+            llm_response = await query_engine.aquery(payload.query)
             
-            if isinstance(llm_response, LlamaStreamingResponse):
+            if isinstance(llm_response, LlamaAsyncStreamingResponse):
+                async for token in llm_response.response_gen:
+                    yield f"data: {json.dumps({'token': token})}\n\n"
+            elif isinstance(llm_response, LlamaStreamingResponse):
                 for token in llm_response.response_gen:
                     yield f"data: {json.dumps({'token': token})}\n\n"
             else:
@@ -74,7 +79,7 @@ async def chat(
                 
             yield "data: [DONE]\n\n"
         except Exception as e:
-            logger.error(f"Error in chat stream: {e}")
+            logger.error(f"Error in chat stream: {e}", exc_info=True)
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
             yield "data: [DONE]\n\n"
 
