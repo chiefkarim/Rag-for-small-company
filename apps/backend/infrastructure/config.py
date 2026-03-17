@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     # App
     MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
+    OCR_MODEL_NAME: str = "openrouter/hunter-alpha"
     COLLECTION_NAME: str = "company-docs"
     
     # Redis

@@ -12,6 +12,15 @@ from llama_index.core import VectorStoreIndex
 from features.google_drive.google_drive_service import GoogleDriveService
 from infrastructure.logging_config import logger
 
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.base_models import InputFormat
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from features.ingestion.custom_ocr import VlmOcrModel, VlmOcrOptions
+from docling.models.factories import get_ocr_factory
+
+# Register the custom VLM OCR model with Docling
+get_ocr_factory().register(VlmOcrModel, plugin_name="custom", plugin_module_name="features.ingestion.custom_ocr")
+
 
 def embed(
     file_ids: list[str],
@@ -71,7 +80,23 @@ def run_embedding(
     Background worker logic to process files.
     """
     with tempfile.TemporaryDirectory() as temp_dir:
-        reader = DoclingReader(export_type=DoclingReader.ExportType.JSON)
+        # Configure Docling with custom VLM OCR
+        pipeline_options = PdfPipelineOptions()
+        pipeline_options.do_ocr = True
+        pipeline_options.allow_external_plugins = True
+        pipeline_options.ocr_options = VlmOcrOptions()
+        pipeline_options.ocr_options.force_full_page_ocr = False
+        
+        converter = DocumentConverter(
+            format_options={
+                InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+            }
+        )
+
+        reader = DoclingReader(
+            export_type=DoclingReader.ExportType.JSON,
+            doc_converter=converter
+        )
         node_parser = DoclingNodeParser()
         
         store = vector_store.get_vector_store()
