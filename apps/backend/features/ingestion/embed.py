@@ -18,8 +18,11 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions
 from features.ingestion.custom_ocr import VlmOcrModel, VlmOcrOptions
 from docling.models.factories import get_ocr_factory
 
-# Register the custom VLM OCR model with Docling
-get_ocr_factory().register(VlmOcrModel, plugin_name="custom", plugin_module_name="features.ingestion.custom_ocr")
+# Register the custom VLM OCR model for both factory instances
+for allow_ext in [False, True]:
+    factory = get_ocr_factory(allow_external_plugins=allow_ext)
+    if "vlm_ocr" not in factory.registered_kind:
+        factory.register(VlmOcrModel, plugin_name="custom", plugin_module_name="features.ingestion.custom_ocr")
 
 
 def embed(
