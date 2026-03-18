@@ -94,6 +94,16 @@ class VlmOcrModel(BaseOcrModel):
                 continue
 
             with TimeRecorder(conv_res, "ocr"):
+                
+                # --- Fallback Strategy: Skip if digital text already exists ---
+                if getattr(self.options, 'force_full_page_ocr', False) is False:
+                    # Collect existing programmatic text from the page
+                    existing_text = "".join([c.text for c in getattr(page, 'cells', []) if getattr(c, 'text', None)])
+                    if len(existing_text.strip()) > 50:
+                        _log.info(f"Page {page.page_no}: Digital text detected natively. Skipping VLM OCR.")
+                        yield page
+                        continue
+
                 # Small delay to respect rate limits between pages
                 if page.page_no > 1:
                     time.sleep(3.0)
