@@ -1,0 +1,43 @@
+# --- Development Dockerfile ---
+# Use official Python image
+FROM python:3.13-slim-bookworm
+
+# Install uv binary from the official image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv /bin/uv
+
+# Install necessary system libraries for OpenCV and OCR (docling) to run on a slim image
+# as well as curl for general utility
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libglib2.0-0 \
+    libgl1 \
+    libxcb1 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Configure uv to use the system Python environment and copy mode
+ENV UV_PYTHON=python3.13
+ENV UV_PYTHON_PREFERENCE=only-system
+ENV UV_LINK_MODE=copy
+
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
+
+# Install project dependencies (including dev)
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+# Ensure the sqlite database directory exists directly in the container
+RUN mkdir -p infrastructure/databases/sqlite
+
+# Set runtime paths
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PORT=8000
+ENV PYTHONUNBUFFERED=1
+
+# Default to fastapi dev command for hot reloading
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8000"]

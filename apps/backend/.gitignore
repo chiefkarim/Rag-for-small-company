@@ -1,0 +1,8 @@
+# Ignore local sqlite databases so watchfiles doesn't infinitely reload
+infrastructure/databases/sqlite/
+*.db
+*.db-wal
+*.db-shm
+*.db-log
+*.sqlite
+*.sqlite3

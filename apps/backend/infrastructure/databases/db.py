@@ -21,7 +21,7 @@ class DatabaseConfig:
 
         print(f"DEBUG: Connecting to local DB at: {settings.DATABASE_LOCAL_PATH}")
         print(f"DEBUG: Syncing with URL: {self._db_url}")
-        self.client = libsql.connect(
+        self.client = libsql.connect(  # type: ignore
             database=settings.DATABASE_LOCAL_PATH,
             sync_url=self._db_url,
             auth_token=self._db_auth_token,
