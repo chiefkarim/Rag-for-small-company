@@ -23,8 +23,9 @@ _index = None
 def get_reranker():
     global _reranker
     if _reranker is None:
+        settings = get_settings()
         _reranker = SentenceTransformerRerank(
-            model="ibm-granite/granite-embedding-reranker-english-r2",
+            model=settings.RERANKER_MODEL_NAME,
             top_n=3,
         )
     return _reranker

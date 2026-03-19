@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     # App
     MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
     OCR_MODEL_NAME: str = "openrouter/hunter-alpha"
+    RERANKER_MODEL_NAME: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     COLLECTION_NAME: str = "company-docs"
     ALLOWED_ORIGINS: str = "http://localhost:5173"
     
