@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
     OCR_MODEL_NAME: str = "openrouter/hunter-alpha"
     COLLECTION_NAME: str = "company-docs"
+    ALLOWED_ORIGINS: str = "http://localhost:5173"
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
