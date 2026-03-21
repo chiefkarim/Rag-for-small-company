@@ -7,30 +7,30 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#080f1e] border-t border-white/5">
-      {/* Top CTA bar */}
-      <div className="bg-gradient-to-r from-[#122663] via-[#1a3a7c] to-[#122663] py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to unify your{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5DD7AD] to-[#4fb3e8]">
-              enterprise knowledge?
-            </span>
+    <footer className="relative bg-secondary/30 border-t border-border/50">
+      {/* Top CTA bar - Elegant & Natural */}
+      <div className="bg-primary py-24 relative overflow-hidden">
+        {/* Subtle texture or pattern could go here */}
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/asfalt-light.png')]" />
+        
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl sm:text-5xl font-serif font-medium text-primary-foreground mb-8 italic">
+            Ready to unify your enterprise insight?
           </h2>
-          <p className="text-white/50 text-base mb-8 max-w-xl mx-auto">
-            Join hundreds of enterprises using latafarraqo to turn fragmented data
-            into actionable, AI-powered intelligence.
+          <p className="text-primary-foreground/70 text-lg mb-12 max-w-xl mx-auto font-light leading-relaxed">
+            Join forward-thinking organizations using Latafarraqo to cultivate 
+            intelligence from their corporate data.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <a
               href="/signup"
-              className="bg-gradient-to-r from-[#5DD7AD] to-[#3ab88e] text-[#0a1628] font-bold px-8 py-3.5 rounded-xl hover:shadow-xl hover:shadow-[#5DD7AD]/30 hover:scale-105 transition-all duration-300 text-sm"
+              className="bg-background text-foreground font-bold px-10 py-4 rounded-full hover:shadow-2xl transition-all duration-300 text-base"
             >
               Get Started Free
             </a>
             <a
               href="#contact"
-              className="text-white/70 hover:text-white text-sm font-medium px-8 py-3.5 rounded-xl border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300"
+              className="text-primary-foreground/80 hover:text-primary-foreground text-base font-medium px-10 py-4 rounded-full border border-primary-foreground/20 hover:border-primary-foreground/40 hover:bg-primary-foreground/5 transition-all duration-300"
             >
               Book a Demo
             </a>
@@ -39,34 +39,25 @@ export default function Footer() {
       </div>
 
       {/* Main footer content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-12">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-1">
-            <a href="#" className="flex items-center gap-2 mb-4 group">
-              <img
-                src="/vector/isolated-monochrome-white.svg"
-                alt="latafarraqo"
-                className="h-8 w-8 group-hover:scale-110 transition-transform"
-              />
-              <div className="flex flex-col leading-none">
-                <span className="text-white font-bold text-xs tracking-wider uppercase">
-                  latafarraqo
-                </span>
-                <span className="text-[#5DD7AD] text-[7px] tracking-[0.2em] uppercase">
-                  la tafarraqo
-                </span>
-              </div>
+            <a href="#" className="flex items-center gap-2 mb-8 group">
+              <span className="text-xl font-serif font-bold italic tracking-tight text-foreground">
+                Latafarraqo
+              </span>
             </a>
-            <p className="text-white/35 text-xs leading-relaxed mb-4">
-              The intelligent heart of your enterprise knowledge base. Production-ready RAG for real teams.
+            <p className="text-muted-foreground/60 text-xs leading-relaxed mb-8 font-light">
+              The intelligent heart of your enterprise knowledge base. 
+              Organic, simple, and production-ready RAG.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {["𝕏", "in", "gh"].map((s) => (
                 <a
                   key={s}
                   href="#"
-                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all text-xs font-bold"
+                  className="w-10 h-10 rounded-full bg-background border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 transition-all text-sm"
                 >
                   {s}
                 </a>
@@ -77,15 +68,15 @@ export default function Footer() {
           {/* Link columns */}
           {Object.entries(FOOTER_LINKS).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-white font-semibold text-xs uppercase tracking-widest mb-4">
+              <h4 className="text-foreground font-serif text-sm italic mb-6">
                 {category}
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-white/40 hover:text-white text-xs transition-colors duration-200"
+                      className="text-muted-foreground hover:text-primary text-sm font-light transition-colors duration-200"
                     >
                       {link}
                     </a>
@@ -97,16 +88,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-white/25 text-xs">
-            © 2026 latafarraqo. All rights reserved.
+        <div className="mt-20 pt-10 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <p className="text-muted-foreground/40 text-[10px] uppercase tracking-widest font-medium">
+            © 2026 Latafarraqo. Crafted with care.
           </p>
-          <div className="flex items-center gap-4">
-            <img
-              src="/vector/default-monochrome-white.svg"
-              alt="latafarraqo"
-              className="h-5 opacity-20 hover:opacity-40 transition-opacity"
-            />
+          <div className="flex items-center gap-6 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
+             <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">SOC2 Type II</span>
+             <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">GDPR Compliant</span>
           </div>
         </div>
       </div>

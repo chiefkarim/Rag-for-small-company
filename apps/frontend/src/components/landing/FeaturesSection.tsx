@@ -47,77 +47,54 @@ const HOW_IT_WORKS = [
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="relative py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628] via-[#0d1e38] to-[#0a1628]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-transparent to-[#5DD7AD]/40" />
+    <section id="features" className="relative py-32 overflow-hidden bg-background">
+      {/* Background decoration */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent to-primary/20" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 text-[#5DD7AD] text-xs uppercase tracking-widest font-semibold mb-4">
-            <span className="w-8 h-px bg-[#5DD7AD]/60" />
-            Feature Deep Dive
-            <span className="w-8 h-px bg-[#5DD7AD]/60" />
+        <div className="text-center max-w-3xl mx-auto mb-24">
+          <div className="inline-flex items-center gap-2 text-primary text-xs uppercase tracking-[0.3em] font-bold mb-6">
+            <span className="w-12 h-px bg-primary/30" />
+            Capabilities
+            <span className="w-12 h-px bg-primary/30" />
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Your RAG Challenge,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5DD7AD] to-[#4fb3e8]">
-              Unlocked
-            </span>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-medium text-foreground mb-8 tracking-tight italic">
+            Your Knowledge, Unlocked
           </h2>
-          <p className="text-white/50 text-lg leading-relaxed">
-            latafarraqo turns your fragmented corporate data into a
-            production-ready RAG engine that your teams can actually use.
+          <p className="text-muted-foreground text-lg leading-relaxed font-light">
+            Latafarraqo turns your fragmented corporate data into a 
+            seamless, organic knowledge engine that your teams can actually trust.
           </p>
         </div>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32">
           {FEATURES.map((feat) => {
             const Icon = feat.icon;
             return (
               <div
                 key={feat.title}
-                className="group relative bg-white/[0.03] border border-white/10 rounded-2xl p-6 hover:bg-white/[0.06] hover:border-white/20 transition-all duration-300 cursor-pointer overflow-hidden"
+                className="group relative bg-card border border-border/50 rounded-3xl p-8 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 cursor-pointer"
               >
-                {/* Glow on hover */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-xl -z-10"
-                  style={{
-                    background: `radial-gradient(circle at 50% 0%, ${feat.color}15, transparent 70%)`,
-                  }}
-                />
-
-                <div className="flex items-start justify-between mb-5">
+                <div className="flex items-start justify-between mb-8">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: `${feat.color}15` }}
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center bg-secondary transition-transform duration-500 group-hover:scale-110"
                   >
-                    <Icon size={22} style={{ color: feat.color }} />
+                    <Icon size={26} className="text-primary" />
                   </div>
-                  <span
-                    className="text-xs font-semibold px-3 py-1 rounded-full border"
-                    style={{
-                      color: feat.color,
-                      borderColor: `${feat.color}30`,
-                      backgroundColor: `${feat.color}10`,
-                    }}
-                  >
-                    {feat.tag}
-                  </span>
                 </div>
 
-                <h3 className="text-white font-bold text-lg mb-3">
+                <h3 className="text-foreground font-serif text-2xl mb-4 group-hover:text-primary transition-colors">
                   {feat.title}
                 </h3>
-                <p className="text-white/50 text-sm leading-relaxed">
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6 font-light">
                   {feat.description}
                 </p>
 
-                <div className="mt-5 flex items-center gap-2 text-xs font-semibold group-hover:gap-3 transition-all duration-200" style={{ color: feat.color }}>
-                  <span>Learn more</span>
-                  <ArrowUpRight size={13} />
+                <div className="mt-auto flex items-center gap-2 text-xs font-bold text-primary opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 uppercase tracking-widest">
+                  <span>Explore detail</span>
+                  <ArrowUpRight size={14} />
                 </div>
               </div>
             );
@@ -125,59 +102,50 @@ export default function FeaturesSection() {
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-20">
-          <div className="flex-1 h-px bg-white/5" />
-          <span className="text-white/20 text-xs uppercase tracking-widest">How it works</span>
-          <div className="flex-1 h-px bg-white/5" />
+        <div className="flex items-center gap-6 mb-24 opacity-30">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground text-[10px] uppercase tracking-[0.4em] font-medium">The Process</span>
+          <div className="flex-1 h-px bg-border" />
         </div>
 
         {/* How it works — 3 steps */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 relative">
-          {/* Connection line */}
-          <div className="absolute top-8 left-1/6 right-1/6 h-px bg-gradient-to-r from-transparent via-[#5DD7AD]/30 to-transparent hidden sm:block" />
-
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 relative mb-32">
           {HOW_IT_WORKS.map((item, idx) => (
             <div key={item.step} className="relative text-center group">
-              <div
-                className={`relative z-10 w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-xl font-black mb-4 transition-all duration-300 group-hover:scale-110 ${
-                  idx === 0
-                    ? "bg-gradient-to-br from-[#5DD7AD]/20 to-[#5DD7AD]/5 border border-[#5DD7AD]/30 text-[#5DD7AD]"
-                    : idx === 1
-                    ? "bg-gradient-to-br from-[#4fb3e8]/20 to-[#4fb3e8]/5 border border-[#4fb3e8]/30 text-[#4fb3e8]"
-                    : "bg-gradient-to-br from-[#a78bfa]/20 to-[#a78bfa]/5 border border-[#a78bfa]/30 text-[#a78bfa]"
-                }`}
-              >
+              <div className="relative z-10 w-20 h-20 mx-auto rounded-full bg-secondary border border-border/50 flex items-center justify-center text-2xl font-serif italic text-primary mb-8 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground group-hover:scale-110 shadow-sm">
                 {item.step}
               </div>
-              <h3 className="text-white font-semibold text-base mb-2">
+              <h3 className="text-foreground font-serif text-xl mb-4">
                 {item.title}
               </h3>
-              <p className="text-white/45 text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed font-light">
                 {item.desc}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Large Feature Highlight — Actionable Knowledge Bases */}
-        <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 hover:bg-white/[0.05] transition-all duration-300 group">
-            <div className="text-[#5DD7AD] text-xs uppercase tracking-widest font-semibold mb-3">
+        {/* Large Feature Highlight */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="bg-secondary/40 border border-border/50 rounded-[2.5rem] p-12 hover:bg-secondary/60 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Database size={120} className="text-primary" />
+            </div>
+            <div className="text-primary text-xs uppercase tracking-[0.2em] font-bold mb-4">
               Seamless Integrations
             </div>
-            <h3 className="text-white text-2xl font-bold mb-3">
-              Connect Your Tools in Minutes
+            <h3 className="text-foreground text-3xl font-serif mb-6 italic">
+              Connect Your World
             </h3>
-            <p className="text-white/50 text-sm leading-relaxed mb-6">
-              From Notion and SharePoint to Confluence and Google Drive — plug in
-              your existing tools with one-click connectors. No custom code. No
-              data locks.
+            <p className="text-muted-foreground text-base leading-relaxed mb-10 font-light">
+              From Notion to SharePoint, plug in your existing ecosystem with one-click connectors. 
+              No code, just connection.
             </p>
-            <div className="flex flex-wrap gap-2">
-              {["Notion", "SharePoint", "Confluence", "Google Drive", "Slack", "wikis"].map((tool) => (
+            <div className="flex flex-wrap gap-3">
+              {["Notion", "SharePoint", "Confluence", "Google Drive", "Slack"].map((tool) => (
                 <span
                   key={tool}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/30 transition-all"
+                  className="text-[10px] uppercase tracking-widest px-4 py-2 rounded-full bg-background/50 border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all cursor-default"
                 >
                   {tool}
                 </span>
@@ -185,30 +153,27 @@ export default function FeaturesSection() {
             </div>
           </div>
 
-          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8 hover:bg-white/[0.05] transition-all duration-300 group">
-            <div className="text-[#4fb3e8] text-xs uppercase tracking-widest font-semibold mb-3">
-              Knowledge Base Engine
+          <div className="bg-primary/5 border border-primary/10 rounded-[2.5rem] p-12 hover:bg-primary/10 transition-all duration-500 group relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Brain size={120} className="text-primary" />
             </div>
-            <h3 className="text-white text-2xl font-bold mb-3">
-              Actionable Knowledge Bases
+            <div className="text-primary text-xs uppercase tracking-[0.2em] font-bold mb-4">
+              Intelligence Engine
+            </div>
+            <h3 className="text-foreground text-3xl font-serif mb-6 italic">
+              The Heart of Insight
             </h3>
-            <p className="text-white/50 text-sm leading-relaxed mb-6">
-              Create your own secure, AI-powered knowledge hubs. From company
-              wikis to product docs, serve instant, context-aware AI answers to
-              any question.
+            <p className="text-muted-foreground text-base leading-relaxed mb-10 font-light">
+              Create secure, contextual knowledge hubs that serve instant, evidence-backed answers.
             </p>
-            <div className="flex items-center gap-8">
-              <div>
-                <div className="text-[#4fb3e8] text-3xl font-black">24.5k</div>
-                <div className="text-white/40 text-xs mt-1">Docs indexed</div>
+            <div className="flex items-center gap-12">
+              <div className="space-y-1">
+                <div className="text-primary text-4xl font-serif italic">24.5k</div>
+                <div className="text-muted-foreground/60 text-[10px] uppercase tracking-widest">Indexed</div>
               </div>
-              <div>
-                <div className="text-[#5DD7AD] text-3xl font-black">99.9%</div>
-                <div className="text-white/40 text-xs mt-1">Uptime SLA</div>
-              </div>
-              <div>
-                <div className="text-white text-3xl font-black">&lt;200ms</div>
-                <div className="text-white/40 text-xs mt-1">Avg. query time</div>
+              <div className="space-y-1">
+                <div className="text-primary text-4xl font-serif italic">99.9%</div>
+                <div className="text-muted-foreground/60 text-[10px] uppercase tracking-widest">Accuracy</div>
               </div>
             </div>
           </div>

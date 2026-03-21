@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 const INTEGRATIONS = [
   { name: "Notion", bg: "#000", color: "#fff", label: "N" },
   { name: "Microsoft", bg: "#0078d4", color: "#fff", label: "M" },
@@ -22,48 +24,44 @@ const TRUSTED = [
 
 export default function IntegrationsSection() {
   return (
-    <section id="integrations" className="relative py-24 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628] to-[#0d1e38]" />
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#5DD7AD]/5 rounded-full blur-[100px]" />
+    <section id="integrations" className="relative py-32 overflow-hidden bg-background">
+      {/* Background decoration */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           {/* Left — Integration logos grid */}
           <div>
-            <div className="inline-flex items-center gap-2 text-[#5DD7AD] text-xs uppercase tracking-widest font-semibold mb-4">
-              <span className="w-8 h-px bg-[#5DD7AD]/60" />
-              Connect Your Tools in Minutes
+            <div className="inline-flex items-center gap-2 text-primary text-xs uppercase tracking-[0.3em] font-bold mb-6">
+              <span className="w-12 h-px bg-primary/30" />
+              Connectivity
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Works with tools{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5DD7AD] to-[#4fb3e8]">
-                your team loves
-              </span>
+            <h2 className="text-4xl sm:text-5xl font-serif font-medium text-foreground mb-8 leading-tight italic">
+              Works with tools your team loves
             </h2>
-            <p className="text-white/50 text-sm leading-relaxed mb-10">
-              Connect all your corporate data sources out of the box. 1000+
-              integrations available. Custom connectors for any source.
+            <p className="text-muted-foreground text-lg leading-relaxed mb-12 font-light">
+              Connect all your corporate data sources out of the box. 
+              1000+ integrations available. Custom connectors for any source.
             </p>
 
             {/* Grid of integration logos */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-4">
               {INTEGRATIONS.map((int) => (
                 <div
                   key={int.name}
                   title={int.name}
-                  className="group flex flex-col items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl p-3 hover:bg-white/[0.08] hover:border-white/25 transition-all duration-200 hover:scale-105 cursor-pointer"
+                  className="group flex flex-col items-center gap-3 bg-card border border-border/50 rounded-2xl p-4 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                 >
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shadow-sm"
                     style={{
                       backgroundColor: int.bg,
                       color: int.color,
-                      boxShadow: `0 4px 12px ${int.bg}40`,
                     }}
                   >
                     {int.label}
                   </div>
-                  <span className="text-white/40 text-[9px] text-center leading-tight truncate w-full text-center group-hover:text-white/60 transition-colors">
+                  <span className="text-muted-foreground text-[10px] uppercase tracking-widest text-center leading-tight truncate w-full group-hover:text-primary transition-colors">
                     {int.name}
                   </span>
                 </div>
@@ -71,44 +69,49 @@ export default function IntegrationsSection() {
             </div>
           </div>
 
-          {/* Right — Trusted by */}
-          <div>
-            <div className="inline-flex items-center gap-2 text-white/40 text-xs uppercase tracking-widest font-semibold mb-6">
-              <span className="w-8 h-px bg-white/20" />
-              Trusted by Innovations
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-10">
-              {TRUSTED.map((t) => (
-                <div
-                  key={t.name}
-                  className="bg-white/[0.03] border border-white/10 rounded-xl p-4 hover:bg-white/[0.06] transition-all duration-200"
-                >
-                  <div className="font-semibold text-white text-sm mb-1">
-                    {t.name}
+          {/* Right — Trusted by & Stats */}
+          <div className="space-y-12">
+            <div>
+              <div className="inline-flex items-center gap-2 text-muted-foreground/40 text-[10px] uppercase tracking-[0.4em] font-bold mb-8">
+                <span className="w-12 h-px bg-border" />
+                Trusted by
+              </div>
+              <div className="grid grid-cols-2 gap-6 mb-12">
+                {TRUSTED.map((t) => (
+                  <div
+                    key={t.name}
+                    className="bg-card border border-border/30 rounded-2xl p-5 hover:border-primary/20 transition-all duration-300"
+                  >
+                    <div className="font-serif italic text-foreground text-lg mb-2">
+                      {t.name}
+                    </div>
+                    {t.desc && (
+                      <p className="text-muted-foreground text-xs leading-relaxed font-light">
+                        {t.desc}
+                      </p>
+                    )}
                   </div>
-                  {t.desc && (
-                    <p className="text-white/40 text-xs leading-relaxed">
-                      {t.desc}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Stats */}
-            <div className="bg-gradient-to-br from-[#5DD7AD]/10 to-[#122663]/30 border border-[#5DD7AD]/20 rounded-2xl p-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-[#5DD7AD] text-2xl font-black">1000+</div>
-                  <div className="text-white/40 text-xs mt-1">Connectors</div>
+              {/* Stats Box - Simple & Natural */}
+              <div className="bg-secondary/50 border border-border/50 rounded-3xl p-10 shadow-sm relative overflow-hidden">
+                <div className="absolute -right-8 -bottom-8 opacity-[0.03]">
+                  <Sparkles size={160} className="text-primary" />
                 </div>
-                <div>
-                  <div className="text-white text-2xl font-black">5min</div>
-                  <div className="text-white/40 text-xs mt-1">Setup time</div>
-                </div>
-                <div>
-                  <div className="text-[#4fb3e8] text-2xl font-black">SOC2</div>
-                  <div className="text-white/40 text-xs mt-1">Compliant</div>
+                <div className="grid grid-cols-3 gap-8 text-center relative z-10">
+                  <div className="space-y-1">
+                    <div className="text-primary text-3xl font-serif italic">1000+</div>
+                    <div className="text-muted-foreground/60 text-[10px] uppercase tracking-widest">Connectors</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-foreground text-3xl font-serif italic">5min</div>
+                    <div className="text-muted-foreground/60 text-[10px] uppercase tracking-widest">Setup</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-primary text-3xl font-serif italic">SOC2</div>
+                    <div className="text-muted-foreground/60 text-[10px] uppercase tracking-widest">Security</div>
+                  </div>
                 </div>
               </div>
             </div>
