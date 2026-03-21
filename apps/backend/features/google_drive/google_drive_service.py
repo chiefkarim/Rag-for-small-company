@@ -21,6 +21,9 @@ class GoogleDriveService:
         if not hasattr(self._local, "service"):
             if settings.GOOGLE_SERVICE_ACCOUNT_JSON:
                 creds_info = json.loads(settings.GOOGLE_SERVICE_ACCOUNT_JSON)
+                if isinstance(creds_info, dict) and "private_key" in creds_info:
+                    # Handle escaped newlines frequently found in environment variables
+                    creds_info["private_key"] = creds_info["private_key"].replace("\\n", "\n")
                 creds = service_account.Credentials.from_service_account_info(
                     creds_info, scopes=self.SCOPES
                 )

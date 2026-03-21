@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     OCR_MODEL_NAME: str = "openrouter/hunter-alpha"
     RERANKER_MODEL_NAME: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     COLLECTION_NAME: str = "company-docs"
-    ALLOWED_ORIGINS: str = "http://localhost:5173"
+    ALLOWED_ORIGINS: str = "http://localhost:5175"
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

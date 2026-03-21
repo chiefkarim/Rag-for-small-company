@@ -21,6 +21,14 @@ class DatabaseConfig:
 
         print(f"DEBUG: Connecting to local DB at: {settings.DATABASE_LOCAL_PATH}")
         print(f"DEBUG: Syncing with URL: {self._db_url}")
+
+        # Ensure the directory for the local DB exists
+        import os
+        db_dir = os.path.dirname(os.path.abspath(settings.DATABASE_LOCAL_PATH))
+        if not os.path.exists(db_dir):
+            print(f"DEBUG: Creating directory {db_dir}")
+            os.makedirs(db_dir, exist_ok=True)
+
         self.client = libsql.connect(  # type: ignore
             database=settings.DATABASE_LOCAL_PATH,
             sync_url=self._db_url,

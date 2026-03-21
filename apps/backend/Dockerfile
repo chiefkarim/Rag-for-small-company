@@ -3,7 +3,7 @@
 FROM python:3.13-slim-bookworm AS builder
 
 # Install uv binary from the official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv /bin/uv
+RUN pip install --no-cache-dir uv
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -39,8 +39,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # --- Stage 2: Final Production Image ---
 FROM python:3.13-slim-bookworm
 
-# Install uv binary
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv /bin/uv
+# uv is already installed via pip in the builder stage; no need to copy binary
 
 # Install necessary system libraries for OpenCV and OCR (docling) to run on a slim image
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -66,14 +65,17 @@ COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 # Copy project files
 COPY . .
 
+# Ensure scripts are executable
+RUN chmod +x scripts/*.sh
+
 # Ensure the sqlite database directory exists directly in the container
 RUN mkdir -p infrastructure/databases/sqlite
 
 # Set runtime paths
 ENV PATH="/app/.venv/bin:$PATH"
-ENV PORT=8000
+ENV PORT=7860
 ENV PYTHONUNBUFFERED=1
+RUN pip install --no-cache-dir uv
 
 # Run the app
-ENTRYPOINT ["uv", "run"]
-CMD ["fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uv run fastapi run main.py --host 0.0.0.0 --port $PORT"]

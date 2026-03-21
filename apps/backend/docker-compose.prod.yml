@@ -1,0 +1,46 @@
+# --- Production Docker Compose ---
+# Use this for deploying the backend infrastructure in production.
+# To run on separate VMs, you can simply use the same file and start only the relevant service.
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "7860:7860" # Map host 7860 to container 7860
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env.dev
+    # Default CMD in Dockerfile is uvicorn/fastapi for the API
+    depends_on:
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "7861:7860" # Map host 7861 to container 7860 for health check
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env.dev
+    # Override CMD to run the worker entrypoint
+    command: ["uv", "run", "scripts/worker_entrypoint.sh"]
+    depends_on:
+      - redis
+
+networks:
+  default:
+    name: enterprise-rag-prod
