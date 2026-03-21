@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from datetime import timedelta
 from deps import get_db
-import sqlite3
+from sqlalchemy.orm import Session
 import jwt
 from features.users import repository as users_repo
 from features.auth.service import (
@@ -33,14 +33,14 @@ class SignUpRequest(BaseModel):
 @router.post("/signup", response_model=User)
 async def sign_up(
     payload: SignUpRequest,
-    db: sqlite3.Connection = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     return register_user(db, payload.name, payload.email, payload.password)
 
 @router.post("/login")
 async def login_for_access_token(
     payload: LoginRequest,
-    db: sqlite3.Connection = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     user = authenticate_user(db, payload.email, payload.password)
     if not user:
@@ -69,7 +69,7 @@ class RefreshRequest(BaseModel):
 @router.post("/refresh")
 async def refresh_token(
     payload: RefreshRequest,
-    db: sqlite3.Connection = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     try:
         token_payload = jwt.decode(payload.refresh_token, str(settings.JWT_SECRET_KEY), algorithms=[settings.ALGORITHM])

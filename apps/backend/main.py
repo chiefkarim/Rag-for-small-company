@@ -3,7 +3,7 @@ from fastapi import Depends, FastAPI, Request
 from starlette.responses import HTMLResponse
 from infrastructure.databases.db import DatabaseConfig
 from infrastructure.vector_store_provider import VectorStoreProvider
-import sqlite3
+from sqlalchemy.orm import Session
 from deps import get_db, get_google_drive, get_vector_store
 from features.query.models import QueryRequest
 from features.ingestion.dto import EmbedRequest
@@ -59,7 +59,7 @@ app.include_router(documents_router)
 app.include_router(chat_router)
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, db: sqlite3.Connection = Depends(get_db)):
+async def home(request: Request, db: Session = Depends(get_db)):
     from features.departments import repository as departments_repo
     deps = departments_repo.get_departments(db)
     departments = [d.name for d in deps]
@@ -84,7 +84,7 @@ def embed(
     payload: EmbedRequest,
     vector_store: VectorStoreProvider = Depends(get_vector_store),
     google_drive: GoogleDriveService = Depends(get_google_drive),
-    db: sqlite3.Connection = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     return embed_service(
         file_ids=payload.file_ids,

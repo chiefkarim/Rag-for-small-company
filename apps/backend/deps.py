@@ -1,12 +1,16 @@
 from fastapi import Request
 from infrastructure.vector_store_provider import VectorStoreProvider
-import sqlite3
+from sqlalchemy.orm import Session
 
 from features.google_drive.google_drive_service import GoogleDriveService
 
 
-def get_db(request: Request) -> sqlite3.Connection:
-    return request.app.state.db.client
+def get_db(request: Request):
+    db: Session = request.app.state.db.SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def get_vector_store(request: Request) -> VectorStoreProvider:

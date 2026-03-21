@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
-import sqlite3
+from sqlalchemy.orm import Session
 from deps import get_db
 from features.users.models import UserInDB, User
 from features.users import repository as users_repo
@@ -32,7 +32,7 @@ def get_password_hash(password: str) -> str:
 
 
 def authenticate_user(
-    db: sqlite3.Connection, email: str, password: str
+    db: Session, email: str, password: str
 ) -> UserInDB | None:
     user = users_repo.get_user_by_email(db, email)
     if not user:
@@ -43,7 +43,7 @@ def authenticate_user(
 
 
 def register_user(
-    db: sqlite3.Connection, name: str, email: str, password: str
+    db: Session, name: str, email: str, password: str
 ) -> User:
     existing_user = users_repo.get_user_by_email(db, email)
     if existing_user:
@@ -52,13 +52,10 @@ def register_user(
             detail="Email already registered",
         )
     hashed_password = get_password_hash(password)
-    users = users_repo.create_user(
+    user = users_repo.create_user(
         db, name=name, email=email, role="user", hashed_password=hashed_password
     )
-    # create_user returns a list, so we take the first element
-    if not users:
-        raise HTTPException(status_code=500, detail="Failed to create user")
-    return users[0]
+    return user
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
@@ -84,7 +81,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> 
 
 async def get_current_user(
     token: Annotated[HTTPAuthorizationCredentials, Depends(security)],
-    db: sqlite3.Connection = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

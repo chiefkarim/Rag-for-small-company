@@ -1,5 +1,5 @@
 import json
-import sqlite3
+from sqlalchemy.orm import Session
 import tempfile
 from typing import Any
 
@@ -30,7 +30,7 @@ def embed(
     project_id: str | None,
     google_drive_service: GoogleDriveService,
     vector_store: VectorStoreProvider,
-    db: sqlite3.Connection,
+    db: Session,
     department: str = "general",
     batch_size: int = 5,
 ):
@@ -75,7 +75,7 @@ def run_embedding(
     project_id: str | None,
     google_drive_service: GoogleDriveService,
     vector_store: VectorStoreProvider,
-    db: sqlite3.Connection,
+    db: Session,
     department: str = "general",
     batch_size: int = 5,
 ):
@@ -162,7 +162,7 @@ def _process_file(
         return []
 
 
-def _update_batch_statuses(db: sqlite3.Connection, succeeded: list[int], failed: list[int]):
+def _update_batch_statuses(db: Session, succeeded: list[int], failed: list[int]):
     """Helper for bulk status updates."""
     if succeeded:
         document_service.mark_documents_embedded(db, succeeded)

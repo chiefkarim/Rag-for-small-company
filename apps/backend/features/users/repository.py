@@ -1,36 +1,21 @@
-import sqlite3
-from features.users.models import User, UserInDB
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from features.users.models import User as UserModel, UserInDB
+from infrastructure.databases.orm import User
 
-
-def get_user_by_email(db: sqlite3.Connection, email: str) -> UserInDB | None:
-    cursor = db.execute("SELECT * FROM users WHERE email = ?", (email,))
-    row = cursor.fetchone()
+def get_user_by_email(db: Session, email: str) -> UserInDB | None:
+    row = db.scalars(select(User).filter(User.email == email)).first()
     if row is None:
         return None
-    columns = [col[0] for col in cursor.description]
-    return UserInDB.model_validate(dict(zip(columns, row)))
+    return UserInDB.model_validate(row)
 
+def get_users(db: Session) -> list[UserModel]:
+    rows = db.scalars(select(User)).all()
+    return [UserModel.model_validate(row) for row in rows]
 
-def get_users(db: sqlite3.Connection) -> list[User]:
-    cursor = db.execute("SELECT * FROM users;")
-    rows = cursor.fetchall()
-    columns = [col[0] for col in cursor.description]
-    return [User.model_validate(dict(zip(columns, row))) for row in rows]
-
-
-def create_user(db: sqlite3.Connection, name: str, email: str, role: str, hashed_password: str) -> list[User]:
-    cursor = db.execute(
-        "INSERT INTO users (name, email, role, hashed_password) VALUES (?, ?, ?, ?)",
-        (name, email, role, hashed_password),
-    )
+def create_user(db: Session, name: str, email: str, role: str, hashed_password: str) -> UserModel:
+    new_user = User(name=name, email=email, role=role, hashed_password=hashed_password)
+    db.add(new_user)
     db.commit()
-
-    user_id = cursor.lastrowid
-
-    cursor = db.execute(
-        "SELECT id, name, email, role, created_at FROM users WHERE id = ?", (user_id,)
-    )
-    columns = [col[0] for col in cursor.description]
-    rows = cursor.fetchall()
-
-    return [User.model_validate(dict(zip(columns, row))) for row in rows]
+    db.refresh(new_user)
+    return UserModel.model_validate(new_user)

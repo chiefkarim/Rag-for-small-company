@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Depends
-import sqlite3
+from sqlalchemy.orm import Session
 from features.projects.dto import CreateProject
 from deps import get_db
 from features.projects.models import Project
@@ -13,11 +13,11 @@ router = APIRouter(prefix="/projects")
     "/",
 )
 async def create_project(
-    payload: CreateProject, db: sqlite3.Connection = Depends(get_db)
+    payload: CreateProject, db: Session = Depends(get_db)
 ):
     return projects_repo.create_project(db, payload.name)
 
 
 @router.get("/", response_model=list[Project])
-async def projects(db: sqlite3.Connection = Depends(get_db)):
+async def projects(db: Session = Depends(get_db)):
     return projects_repo.get_projects(db)

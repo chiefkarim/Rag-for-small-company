@@ -68,9 +68,6 @@ COPY . .
 # Ensure scripts are executable
 RUN chmod +x scripts/*.sh
 
-# Ensure the sqlite database directory exists directly in the container
-RUN mkdir -p infrastructure/databases/sqlite
-
 # Set runtime paths
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PORT=7860

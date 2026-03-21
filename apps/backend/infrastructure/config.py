@@ -12,10 +12,8 @@ class Settings(BaseSettings):
         print(f"DEBUG: Loaded REDIS_URL='{self.REDIS_URL}'")
     # Database
     DATABASE_URL: str
-    DATABASE_READ_AUTH_TOKEN: str
-    DATABASE_WRITE_AUTH_TOKEN: str
-    DATABASE_LOCAL_PATH: str = "./infrastructure/databases/sqlite/local.db"
-
+    DATABASE_READ_AUTH_TOKEN: str | None = None
+    DATABASE_WRITE_AUTH_TOKEN: str | None = None
     # Qdrant
     QDRANT_API_KEY: str
     QDRANT_URL: str
@@ -55,9 +53,16 @@ class Settings(BaseSettings):
         for field_name, value in self.__dict__.items():
             if isinstance(value, str):
                 # Aggressive stripping of quotes and whitespace
-                # This handles strings like '"my-url"' or " 'my-token' "
                 cleaned = value.strip().strip("\"'")
                 setattr(self, field_name, cleaned)
+        
+        # SQLAlchemy requires 'postgresql://' instead of 'postgres://' for standard psycopg2
+        if hasattr(self, 'DATABASE_URL') and self.DATABASE_URL:
+            if self.DATABASE_URL.startswith('postgres://'):
+                self.DATABASE_URL = self.DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+            elif self.DATABASE_URL.startswith('postgresql+psycopg://'):
+                self.DATABASE_URL = self.DATABASE_URL.replace('postgresql+psycopg://', 'postgresql://', 1)
+            
         return self
 
 @lru_cache

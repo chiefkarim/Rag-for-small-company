@@ -1,25 +1,15 @@
-import sqlite3
-from features.projects.models import Project
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from features.projects.models import Project as ProjectModel
+from infrastructure.databases.orm import Project
 
-
-def create_project(db: sqlite3.Connection, name: str) -> Project:
-    cursor = db.execute("INSERT INTO projects (name) VALUES (?)", (name,))
+def create_project(db: Session, name: str) -> ProjectModel:
+    new_project = Project(name=name)
+    db.add(new_project)
     db.commit()
+    db.refresh(new_project)
+    return ProjectModel.model_validate(new_project)
 
-    project_id = cursor.lastrowid
-
-    cursor = db.execute(
-        "SELECT id, name, created_at FROM projects WHERE id = ?", (project_id,)
-    )
-    columns = [col[0] for col in cursor.description]
-    row = cursor.fetchone()
-
-    return Project.model_validate(dict(zip(columns, row)))
-
-
-def get_projects(db: sqlite3.Connection) -> list[Project]:
-    cursor = db.execute("SELECT * FROM projects;")
-    columns = [col[0] for col in cursor.description]
-    rows = cursor.fetchall()
-
-    return [Project.model_validate(dict(zip(columns, row))) for row in rows]
+def get_projects(db: Session) -> list[ProjectModel]:
+    rows = db.scalars(select(Project)).all()
+    return [ProjectModel.model_validate(row) for row in rows]
