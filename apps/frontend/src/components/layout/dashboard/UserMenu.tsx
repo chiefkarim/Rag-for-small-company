@@ -24,21 +24,24 @@ export function UserMenu({ user }: { user: User | null | undefined }) {
   if (!user) return null;
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-6">
        <button
         id="logout-btn"
         onClick={handleLogout}
-        className="flex items-center gap-2 text-sm text-red-400/80 hover:text-red-400 transition-colors"
+        className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-red-500/60 hover:text-red-500 transition-colors"
       >
         <LogOut className="w-4 h-4" />
         Sign out
       </button>
       
-      <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5DD7AD] to-[#3ab88e] flex items-center justify-center text-[10px] font-bold text-[#0a1628] shadow-md">
+      <div className="flex items-center gap-4 pl-6 border-l border-border/50">
+        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-xs font-serif italic text-primary-foreground shadow-sm">
           {getInitials(user.name)}
         </div>
-        <span className="text-sm text-white/70 font-medium hidden sm:inline-block">{user.name}</span>
+        <div className="hidden sm:flex flex-col">
+          <span className="text-sm text-foreground font-serif italic font-medium leading-none">{user.name}</span>
+          <span className="text-[9px] uppercase tracking-tighter text-muted-foreground mt-1">Administrator</span>
+        </div>
       </div>
     </div>
   );

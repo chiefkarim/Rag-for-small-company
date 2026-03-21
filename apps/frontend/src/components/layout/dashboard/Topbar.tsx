@@ -28,11 +28,11 @@ export function Topbar({ user }: { user: User | null | undefined }) {
   const pageInfo = pageTitles[currentPath] || { title: 'Dashboard', description: '' };
 
   return (
-    <header className="border-b border-white/5 px-8 py-4 flex items-center justify-between bg-[#080f1e]/80 backdrop-blur-sm sticky top-0 z-20">
+    <header className="border-b border-border/50 px-8 py-6 flex items-center justify-between bg-background/80 backdrop-blur-sm sticky top-0 z-20">
       <div>
-        <h1 className="text-lg font-semibold text-white">{pageInfo.title}</h1>
+        <h1 className="text-xl font-serif italic font-medium text-foreground">{pageInfo.title}</h1>
         {pageInfo.description && (
-          <p className="text-xs text-white/40 mt-0.5">{pageInfo.description}</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1 font-medium">{pageInfo.description}</p>
         )}
       </div>
       <UserMenu user={user} />
